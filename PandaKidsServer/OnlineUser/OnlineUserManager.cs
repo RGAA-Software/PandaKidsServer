@@ -1,4 +1,4 @@
-﻿namespace PandaKidsServer.User;
+﻿namespace PandaKidsServer.OnlineUser;
 
 public class OnlineUserManager
 {

@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using PandaKidsServer.Handlers;
 
-namespace PandaKidsServer.User;
+namespace PandaKidsServer.OnlineUser;
 
 public class OnlineUser
 {

@@ -1,7 +1,7 @@
 using Microsoft.Extensions.FileProviders;
 using PandaKidsServer.Common;
 using PandaKidsServer.Handlers;
-using PandaKidsServer.User;
+using PandaKidsServer.OnlineUser;
 using Serilog;
 using AppContext = PandaKidsServer.AppContext;
 
@@ -20,6 +20,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var appContext = new AppContext();
+appContext.Init();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
