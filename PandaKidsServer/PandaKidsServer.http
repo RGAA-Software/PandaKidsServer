@@ -1,0 +1,6 @@
+@PandaKidsServer_HostAddress = http://localhost:9988
+
+GET {{PandaKidsServer_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

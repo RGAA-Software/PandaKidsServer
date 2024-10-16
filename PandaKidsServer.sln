@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PandaKidsServer", "PandaKidsServer\PandaKidsServer.csproj", "{DC36859B-5A91-4C3C-A029-BBF16EA44118}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{2D3ECE3C-18B8-4D31-B49E-8D67FC257619}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DC36859B-5A91-4C3C-A029-BBF16EA44118}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC36859B-5A91-4C3C-A029-BBF16EA44118}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC36859B-5A91-4C3C-A029-BBF16EA44118}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC36859B-5A91-4C3C-A029-BBF16EA44118}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2D3ECE3C-18B8-4D31-B49E-8D67FC257619}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D3ECE3C-18B8-4D31-B49E-8D67FC257619}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D3ECE3C-18B8-4D31-B49E-8D67FC257619}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D3ECE3C-18B8-4D31-B49E-8D67FC257619}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
