@@ -1,9 +1,11 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Driver;
+using PandaKidsServer.DB.Entities;
+using Serilog;
 
 namespace PandaKidsServer.DB.Operators;
 
-public abstract class CollectionOperator<T>
+public abstract class CollectionOperator<T> where T: Entity
 {
     private readonly AppContext _appContext;
     private readonly IMongoCollection<T> _collection;
@@ -12,32 +14,33 @@ public abstract class CollectionOperator<T>
     {
         _appContext = ctx;
         _collection = collection;
-        var indexKeysDefinition = Builders<T>.IndexKeys.Ascending("Eid");
-        var createIndexModel = new CreateIndexModel<T>(indexKeysDefinition, new CreateIndexOptions { Unique = true });
-        var indexName = collection.Indexes.CreateOne(createIndexModel);
+        // var indexKeysDefinition = Builders<T>.IndexKeys.Ascending("Eid");
+        // var createIndexModel = new CreateIndexModel<T>(indexKeysDefinition, new CreateIndexOptions { Unique = true });
+        // var indexName = collection.Indexes.CreateOne(createIndexModel);
     }
 
-    public bool InsertEntity(T entity)
+    public string InsertEntity(T entity)
     {
         try
         {
             _collection.InsertOne(entity);
-            return true;
+            return entity.Id.ToString();
         }
         catch (Exception e)
         {
-            return false;
+            Log.Error("Insert error:" + entity + " because of : " + e.Message);
+            return "";
         }
     }
 
-    public void DeleteEntity(string eid)
+    public void DeleteEntity(string id)
     {
-        _collection.DeleteOne(new BsonDocument("Eid", eid));
+        _collection.DeleteOne(new BsonDocument("Eid", BsonObjectId.Create(id)));
     }
 
-    public bool UpdateEntity(string eid, Dictionary<string, object> value)
+    public bool UpdateEntity(string id, Dictionary<string, object> value)
     {
-        var filter = Builders<T>.Filter.Eq("Eid", eid);
+        var filter = Builders<T>.Filter.Eq("Eid", BsonObjectId.Create(id));
         var result = _collection.UpdateOne(filter, 
             new BsonDocument("$set", new BsonDocument(value)), 
             new UpdateOptions { IsUpsert = true });
@@ -47,7 +50,7 @@ public abstract class CollectionOperator<T>
     public T? FindEntityById(string id)
     {
         var filter = Builders<T>.Filter;
-        return _collection.Find(filter.Eq("Eid", id)).FirstOrDefault();
+        return _collection.Find(filter.Eq("Eid", BsonObjectId.Create(id))).FirstOrDefault();
     }
 
     public List<T> QueryEntity(int page, int pageSize)

@@ -1,6 +1,6 @@
 ﻿namespace PandaKidsServer.DB.Entities;
 
-public class User
+public class User : Entity
 {
     
 }

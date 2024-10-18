@@ -4,9 +4,9 @@ using MongoDB.Bson.Serialization.Attributes;
 namespace PandaKidsServer.DB.Entities;
 
 /// <summary>
-/// single book with or without audio/video
+/// includes one or more books; a suit of books
 /// </summary>
-public class Book : Entity
+public class BookSuit : Entity
 {
     public string Author = "";
 
@@ -15,11 +15,6 @@ public class Book : Entity
     public string Details = "";
     
     public string Summary = "";
-
-    public string PdfPath = "";
-
-    // video's object id
-    public List<string> VideoIds = [];
-    // audio's object id
-    public List<string> AudioIds = [];
+    
+    public List<string> BookIds = [];
 }

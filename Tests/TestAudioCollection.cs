@@ -27,7 +27,6 @@ public class TestAudioCollection
         {
             _audioOperator.InsertEntity(new Audio
             {
-                Eid = "123456_" + i,
                 Name = "The Pancake = " + i
             });
         }
@@ -36,7 +35,7 @@ public class TestAudioCollection
     [Test]
     public void TestUpdateAudio()
     {
-        var result = _audioOperator.UpdateEntity("123456", new Dictionary<string, object>
+        var result = _audioOperator.UpdateEntity("6712127e4d166c8612632de4", new Dictionary<string, object>
         {
             {"Name", "Jack Sparrow2"},
             {"Age", 1002},
@@ -49,13 +48,13 @@ public class TestAudioCollection
     [Test]
     public void TestDeleteAudio()
     {
-        _audioOperator.DeleteEntity("12345");
+        _audioOperator.DeleteEntity("6712127f4d166c8612632de5");
     }
 
     [Test]
     public void TestFindAAudio()
     {
-        var audio = _audioOperator.FindEntityById("123456");
+        var audio = _audioOperator.FindEntityById("6712127e4d166c8612632de4");
         Console.WriteLine("audio: " + audio);
         Assert.NotNull(audio);
     }
@@ -71,11 +70,11 @@ public class TestAudioCollection
     [Test]
     public void TestQueryAudio()
     {
-        var audios =_audioOperator.QueryEntity(2, 10);
+        var audios =_audioOperator.QueryEntity(2, 3);
         Assert.NotNull(audios);
         foreach (var audio in audios)
         {
-            Console.WriteLine(audio);
+            Console.WriteLine("audio: " + audio.ToJson());
         }
     }
 }

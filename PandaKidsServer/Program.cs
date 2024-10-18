@@ -13,14 +13,15 @@ Log.Logger = new LoggerConfiguration()
         shared: true
     ).CreateLogger();
 
+var appContext = new AppContext();
+appContext.Init();
+
 var builder = WebApplication.CreateBuilder(args);
 builder.WebHost.UseUrls("http://0.0.0.0:9988");
 builder.Services.AddControllers();
+builder.Services.AddSingleton(appContext);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
-var appContext = new AppContext();
-appContext.Init();
 
 var app = builder.Build();
 

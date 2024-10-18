@@ -13,6 +13,7 @@ public class AppContext
     {
         _onlineUserManager = new OnlineUserManager(this);
         _database = new Database(this);
+        Console.WriteLine("ctx: " + this.GetHashCode());
     }
 
     public void Init()

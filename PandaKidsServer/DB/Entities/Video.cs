@@ -1,6 +1,9 @@
 ﻿namespace PandaKidsServer.DB.Entities;
 
-public class Video
+/// <summary>
+/// single video
+/// </summary>
+public class Video : Entity
 {
     
 }

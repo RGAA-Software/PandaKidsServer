@@ -3,14 +3,11 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace PandaKidsServer.DB.Entities;
 
-public class Audio
+/// <summary>
+/// single audio
+/// </summary>
+public class Audio : Entity
 {
-    [BsonElement("_id")]
-    public ObjectId ObjectId = ObjectId.GenerateNewId();
-    
-    public string Eid = "";
-
-    public string Name = "";
 
     public int Age = 0;
 
@@ -20,6 +17,7 @@ public class Audio
 
     public override string ToString()
     {
-        return "Eid: " + Eid + ", Name: " + Name;
+        return "Eid: " + Id.ToString() + ", Name: " + Name;
     }
+    
 }

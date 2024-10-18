@@ -27,7 +27,6 @@ public class TestBookCollection
         {
             _bookOperator.InsertEntity(new Book
             {
-                Eid = "Book_" + i,
                 Name = "Fancy Dress = " + i
             });
         }

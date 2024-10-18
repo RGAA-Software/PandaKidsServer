@@ -3,7 +3,7 @@
 /// <summary>
 /// includes one or more videos
 /// </summary>
-public class Cartoon
+public class Cartoon : Entity
 {
     
 }
