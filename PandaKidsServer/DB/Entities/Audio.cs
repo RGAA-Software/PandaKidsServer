@@ -11,4 +11,15 @@ public class Audio
     public string Eid = "";
 
     public string Name = "";
+
+    public int Age = 0;
+
+    public string Pets = "";
+
+    public string Hobbies = "";
+
+    public override string ToString()
+    {
+        return "Eid: " + Eid + ", Name: " + Name;
+    }
 }

@@ -1,0 +1,81 @@
+using PandaKidsServer.DB.Entities;
+using PandaKidsServer.DB.Operators;
+
+namespace Tests;
+
+using PandaKidsServer;
+
+public class TestAudioCollection
+{
+    private AppContext _appContext;
+    private AudioOperator _audioOperator;
+    
+    [SetUp]
+    public void Setup()
+    {
+        _appContext = new AppContext();
+        _appContext.Init();
+        
+        var db = _appContext.GetDatabase();
+        _audioOperator = db.GetAudioOperator();
+    }
+
+    [Test]
+    public void TestInputAudio()
+    {
+        for (var i = 0; i < 10; i++)
+        {
+            _audioOperator.InsertEntity(new Audio
+            {
+                Eid = "123456_" + i,
+                Name = "The Pancake = " + i
+            });
+        }
+    }
+
+    [Test]
+    public void TestUpdateAudio()
+    {
+        var result = _audioOperator.UpdateEntity("123456", new Dictionary<string, object>
+        {
+            {"Name", "Jack Sparrow2"},
+            {"Age", 1002},
+            {"Pets", "A dog and a cat"},
+            {"Hobbies", "Fishing"},
+        });
+        //Assert.That(result, Is.True);
+    }
+
+    [Test]
+    public void TestDeleteAudio()
+    {
+        _audioOperator.DeleteEntity("12345");
+    }
+
+    [Test]
+    public void TestFindAAudio()
+    {
+        var audio = _audioOperator.FindEntityById("123456");
+        Console.WriteLine("audio: " + audio);
+        Assert.NotNull(audio);
+    }
+
+    [Test]
+    public void TestCountAudio()
+    {
+        var counts = _audioOperator.CountTotalEntities();
+        Console.WriteLine("counts: " + counts);
+        Assert.GreaterOrEqual(counts, 1);
+    }
+
+    [Test]
+    public void TestQueryAudio()
+    {
+        var audios =_audioOperator.QueryEntity(2, 10);
+        Assert.NotNull(audios);
+        foreach (var audio in audios)
+        {
+            Console.WriteLine(audio);
+        }
+    }
+}

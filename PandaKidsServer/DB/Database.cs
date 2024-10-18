@@ -11,13 +11,13 @@ public class Database
     private MongoClient _mongoClient;
     private IMongoDatabase _mongoDatabase;
     
-    private IMongoCollection<Book> _bookCollection;
     private IMongoCollection<Cartoon> _cartoonCollection;
     private IMongoCollection<Comic> _comicCollection;
     private IMongoCollection<User> _userCollection;
     private IMongoCollection<Video> _videoCollection;
 
     private AudioOperator _audioOperator;
+    private BookOperator _bookOperator;
     
     public Database(AppContext ctx)
     {
@@ -46,7 +46,9 @@ public class Database
         var audioCollection = _mongoDatabase.GetCollection<Audio>(nameof(Audio));
         _audioOperator = new AudioOperator(_appContext, audioCollection);
             
-        _bookCollection = _mongoDatabase.GetCollection<Book>(nameof(Book));
+        var bookCollection = _mongoDatabase.GetCollection<Book>(nameof(Book));
+        _bookOperator = new BookOperator(_appContext, bookCollection);
+        
         _cartoonCollection = _mongoDatabase.GetCollection<Cartoon>(nameof(Cartoon));
         _comicCollection = _mongoDatabase.GetCollection<Comic>(nameof(Comic));
         _userCollection = _mongoDatabase.GetCollection<User>(nameof(User));
@@ -58,6 +60,11 @@ public class Database
     public AudioOperator GetAudioOperator()
     {
         return _audioOperator;
+    }
+
+    public BookOperator GetBookOperator()
+    {
+        return _bookOperator;
     }
 
 }
