@@ -4,13 +4,13 @@ using Newtonsoft.Json;
 namespace PandaKidsServer.Controllers;
 
 [ApiController]
-[Route("audio")]
-public class AudioController(AppContext ctx) : ControllerBase
+[Route("book")]
+public class BookController(AppContext ctx) : ControllerBase
 {
     private readonly AppContext _appContext = ctx;
     
     [HttpPost("insert")]
-    public IActionResult InsertAudio(IFormCollection form)
+    public IActionResult InsertBook(IFormCollection form)
     {
         foreach (var key in form.Keys)
         {
@@ -26,7 +26,7 @@ public class AudioController(AppContext ctx) : ControllerBase
     }
     
     [HttpPost("delete/{id}")]
-    public IActionResult DeleteAudio(int id)
+    public IActionResult DeleteBook(int id)
     {
         if (id > 0)
         {
@@ -39,7 +39,7 @@ public class AudioController(AppContext ctx) : ControllerBase
     }
 
     [HttpGet("query/{id}")]
-    public IActionResult QueryAudio(string id)
+    public IActionResult QueryBook(string id)
     {
         var json = JsonConvert.SerializeObject(new Dictionary<string, string>()
         {
@@ -49,9 +49,8 @@ public class AudioController(AppContext ctx) : ControllerBase
     }
     
     [HttpGet("query")]
-    public IActionResult QueryAudios()
+    public IActionResult QueryBooks()
     {
         return Ok();
     }
-    
 }

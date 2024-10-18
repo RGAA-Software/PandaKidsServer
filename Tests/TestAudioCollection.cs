@@ -38,9 +38,6 @@ public class TestAudioCollection
         var result = _audioOperator.UpdateEntity("6712127e4d166c8612632de4", new Dictionary<string, object>
         {
             {"Name", "Jack Sparrow2"},
-            {"Age", 1002},
-            {"Pets", "A dog and a cat"},
-            {"Hobbies", "Fishing"},
         });
         //Assert.That(result, Is.True);
     }

@@ -13,7 +13,6 @@ public class AppContext
     {
         _onlineUserManager = new OnlineUserManager(this);
         _database = new Database(this);
-        Console.WriteLine("ctx: " + this.GetHashCode());
     }
 
     public void Init()
@@ -22,6 +21,27 @@ public class AppContext
         {
             Log.Error("Connect to mongodb failed!");
             return;
+        }
+        // make dirs
+        var currentDirectory = Directory.GetCurrentDirectory() + "/Resources";
+        var dirs = new List<string>
+        {
+            "Books", "Videos", "Audios"
+        };
+        foreach (var dir in dirs)
+        {
+            var targetDir = currentDirectory + "/" + dir;
+            try
+            {
+                if (!Directory.Exists(targetDir))
+                {
+                    Directory.CreateDirectory(targetDir);
+                }
+            }
+            catch (Exception e)
+            {
+                Log.Error("Create folder failed: " + dir);
+            }
         }
     }
 

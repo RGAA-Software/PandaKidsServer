@@ -11,6 +11,12 @@ public abstract class Entity
 
     public string Name = "";
 
+    public string Cover = "Cover";
+
+    public string Summary = "Summary";
+
+    public string Author = "Author";
+    
     public string ToJson()
     {
         return JsonConvert.SerializeObject(this);
