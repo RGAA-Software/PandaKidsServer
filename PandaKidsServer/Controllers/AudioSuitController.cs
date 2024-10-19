@@ -1,16 +1,16 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
 namespace PandaKidsServer.Controllers;
 
 [ApiController]
-[Route("video")]
-public class VideoController(AppContext ctx) : ControllerBase
+[Route("audio/suit")]
+public class AudioSuitController(AppContext ctx) : ControllerBase
 {
     private readonly AppContext _appContext = ctx;
-
+    
     [HttpPost("insert")]
-    public IActionResult InsertVideo(IFormCollection form)
+    public IActionResult InsertAudio(IFormCollection form)
     {
         foreach (var key in form.Keys)
         {
@@ -26,7 +26,7 @@ public class VideoController(AppContext ctx) : ControllerBase
     }
     
     [HttpPost("delete/{id}")]
-    public IActionResult DeleteVideo(int id)
+    public IActionResult DeleteAudio(int id)
     {
         if (id > 0)
         {
@@ -39,7 +39,7 @@ public class VideoController(AppContext ctx) : ControllerBase
     }
 
     [HttpGet("query/{id}")]
-    public IActionResult QueryVideo(string id)
+    public IActionResult QueryAudio(string id)
     {
         var json = JsonConvert.SerializeObject(new Dictionary<string, string>()
         {
@@ -49,8 +49,9 @@ public class VideoController(AppContext ctx) : ControllerBase
     }
     
     [HttpGet("query")]
-    public IActionResult QueryVideos()
+    public IActionResult QueryAudios()
     {
         return Ok();
     }
+    
 }

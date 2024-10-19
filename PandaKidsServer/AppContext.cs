@@ -8,11 +8,13 @@ public class AppContext
 {
     private readonly OnlineUserManager _onlineUserManager;
     private readonly Database _database;
+    private readonly ResManager.ResManager _resManager;
     
     public AppContext()
     {
         _onlineUserManager = new OnlineUserManager(this);
         _database = new Database(this);
+        _resManager = new ResManager.ResManager(this);
     }
 
     public void Init()
@@ -22,27 +24,7 @@ public class AppContext
             Log.Error("Connect to mongodb failed!");
             return;
         }
-        // make dirs
-        var currentDirectory = Directory.GetCurrentDirectory() + "/Resources";
-        var dirs = new List<string>
-        {
-            "Books", "Videos", "Audios"
-        };
-        foreach (var dir in dirs)
-        {
-            var targetDir = currentDirectory + "/" + dir;
-            try
-            {
-                if (!Directory.Exists(targetDir))
-                {
-                    Directory.CreateDirectory(targetDir);
-                }
-            }
-            catch (Exception e)
-            {
-                Log.Error("Create folder failed: " + dir);
-            }
-        }
+        _resManager.Init();
     }
 
     public OnlineUserManager GetOnlineUserManager()
@@ -54,4 +36,10 @@ public class AppContext
     {
         return _database;
     }
+
+    public ResManager.ResManager GetResManager()
+    {
+        return _resManager;
+    }
+
 }

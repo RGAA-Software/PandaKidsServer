@@ -1,16 +1,35 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using PandaKidsServer.DB.Entities;
+using PandaKidsServer.DB.Operators;
 
 namespace PandaKidsServer.Controllers;
 
 [ApiController]
-[Route("audio")]
-public class AudioController(AppContext ctx) : ControllerBase
+[Route("book/suit")]
+public class BookSuitController : PkBaseController
 {
-    private readonly AppContext _appContext = ctx;
+    private readonly BookSuitOperator _bookSuitOperator;
     
+    public BookSuitController(AppContext ctx) : base(ctx)
+    {
+        _appContext = ctx;
+        _bookSuitOperator = _appContext.GetDatabase().GetBookSuitOperator();
+    }
+
+    [HttpPost("create")]
+    public IActionResult CreateSuit(IFormCollection form)
+    {
+        if (!form.TryGetValue(EntityKey.KeyName, out var name))
+        {
+            return RespError(ControllerError.ErrParamErr);
+        }
+        
+        return Ok();
+    }
+
     [HttpPost("insert")]
-    public IActionResult InsertAudio(IFormCollection form)
+    public IActionResult InsertBook(IFormCollection form)
     {
         foreach (var key in form.Keys)
         {
@@ -26,7 +45,7 @@ public class AudioController(AppContext ctx) : ControllerBase
     }
     
     [HttpPost("delete/{id}")]
-    public IActionResult DeleteAudio(int id)
+    public IActionResult DeleteBook(int id)
     {
         if (id > 0)
         {
@@ -39,7 +58,7 @@ public class AudioController(AppContext ctx) : ControllerBase
     }
 
     [HttpGet("query/{id}")]
-    public IActionResult QueryAudio(string id)
+    public IActionResult QueryBook(string id)
     {
         var json = JsonConvert.SerializeObject(new Dictionary<string, string>()
         {
@@ -49,9 +68,8 @@ public class AudioController(AppContext ctx) : ControllerBase
     }
     
     [HttpGet("query")]
-    public IActionResult QueryAudios()
+    public IActionResult QueryBooks()
     {
         return Ok();
     }
-    
 }

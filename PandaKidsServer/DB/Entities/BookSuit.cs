@@ -8,13 +8,9 @@ namespace PandaKidsServer.DB.Entities;
 /// </summary>
 public class BookSuit : Entity
 {
-    public string Author = "";
-
     public string Content = "";
 
     public string Details = "";
-    
-    public string Summary = "";
     
     public List<string> BookIds = [];
 }

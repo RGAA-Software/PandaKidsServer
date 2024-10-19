@@ -1,56 +1,74 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using PandaKidsServer.DB.Entities;
+using PandaKidsServer.DB.Operators;
 
 namespace PandaKidsServer.Controllers;
 
 [ApiController]
 [Route("book")]
-public class BookController(AppContext ctx) : ControllerBase
+public class BookController : PkBaseController
 {
-    private readonly AppContext _appContext = ctx;
+    private readonly BookOperator _bookOperator;
+    
+    public BookController(AppContext ctx) : base(ctx)
+    {
+        _appContext = ctx;
+        _bookOperator = _database.GetBookOperator();
+    }
     
     [HttpPost("insert")]
-    public IActionResult InsertBook(IFormCollection form)
+    public async Task<IActionResult> CreateBook(IFormCollection form)
     {
-        foreach (var key in form.Keys)
+        // * pdf
         {
-            Console.WriteLine("key: " + key + ", val: " + form[key]);
+            var ret = await CopyBook(form, EntityKey.KeyPdfFile);
+            if (ret.Key != null)
+            {
+                return ret.Key;
+            }
+            var paths = ret.Val;
+            // insert to database
+            Console.WriteLine("copy to: " + (paths != null ? paths.ToString(): "xx"));
+        }
+        // * cover
+        {
+            var ret = await CopyImage(form, EntityKey.KeyCoverFile);
+            if (ret.Key != null)
+            {
+                return ret.Key;
+            }
+            var paths = ret.Val;
+            Console.WriteLine("copy to: " + (paths != null ? paths.ToString(): "xx"));
+        }
+        // audio
+        {
+            var ret = await CopyAudio(form, EntityKey.KeyAudioFile);
+            if (ret.Key == null && ret.Val != null) // OK
+            {
+                
+            }
+        }
+        // video
+        {
+            var ret = await CopyVideo(form, EntityKey.KeyVideoFile);
+            if (ret.Key == null && ret.Val != null) // OK
+            {
+                
+            }
         }
         
-        foreach (var file in form.Files)
+        if (!form.TryGetValue(EntityKey.KeyName, out var name)
+            || !form.TryGetValue(EntityKey.KeySummary, out var summary))
         {
-            Console.WriteLine("file: " + file.Name + ", " + file.Length);
+            return RespError(ControllerError.ErrParamErr);
         }
-    
-        return Ok();
-    }
-    
-    [HttpPost("delete/{id}")]
-    public IActionResult DeleteBook(int id)
-    {
-        if (id > 0)
-        {
-            return Ok("");
-        }
-        else
-        {
-            return NotFound();
-        }
-    }
 
-    [HttpGet("query/{id}")]
-    public IActionResult QueryBook(string id)
-    {
-        var json = JsonConvert.SerializeObject(new Dictionary<string, string>()
+        _bookOperator.InsertEntity(new Book
         {
-            { "name", id }
+
         });
-        return Ok(json);
-    }
-    
-    [HttpGet("query")]
-    public IActionResult QueryBooks()
-    {
-        return Ok();
+        
+        return RespOk();
     }
 }

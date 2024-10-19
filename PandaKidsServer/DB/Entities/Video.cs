@@ -5,5 +5,5 @@
 /// </summary>
 public class Video : Entity
 {
-    
+    public string VideoPath = "";
 }

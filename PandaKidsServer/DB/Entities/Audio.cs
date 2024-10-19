@@ -8,9 +8,6 @@ namespace PandaKidsServer.DB.Entities;
 /// </summary>
 public class Audio : Entity
 {
-    public override string ToString()
-    {
-        return "Eid: " + Id.ToString() + ", Name: " + Name;
-    }
+    public string AudioPath = "";
     
 }

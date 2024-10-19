@@ -11,11 +11,11 @@ public abstract class Entity
 
     public string Name = "";
 
-    public string Cover = "Cover";
+    public string CoverPath = "";
 
-    public string Summary = "Summary";
+    public string Summary = "";
 
-    public string Author = "Author";
+    public string Author = "";
     
     public string ToJson()
     {

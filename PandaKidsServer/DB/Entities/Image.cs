@@ -8,5 +8,5 @@ namespace PandaKidsServer.DB.Entities;
 /// </summary>
 public class Image : Entity
 {
-    public string Path = "";
+    public string ImagePath = "";
 }
