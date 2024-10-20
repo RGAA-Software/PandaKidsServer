@@ -7,6 +7,4 @@ namespace PandaKidsServer.Controllers;
 public class ImageSuitController(AppContext ctx) : ControllerBase
 {
     private readonly AppContext _appContext = ctx;
-    
-    
 }

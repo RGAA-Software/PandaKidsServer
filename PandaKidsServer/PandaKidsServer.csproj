@@ -7,25 +7,25 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="MongoDB.Bson" Version="2.29.0" />
-        <PackageReference Include="MongoDB.Driver" Version="2.29.0" />
-        <PackageReference Include="MongoDB.Driver.Core" Version="2.29.0" />
-        <PackageReference Include="Nett" Version="0.15.0" />
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-        <PackageReference Include="Serilog" Version="4.1.0-dev-02238" />
-        <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
+        <PackageReference Include="MongoDB.Bson" Version="2.29.0"/>
+        <PackageReference Include="MongoDB.Driver" Version="2.29.0"/>
+        <PackageReference Include="MongoDB.Driver.Core" Version="2.29.0"/>
+        <PackageReference Include="Nett" Version="0.15.0"/>
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
+        <PackageReference Include="Serilog" Version="4.1.0-dev-02238"/>
+        <PackageReference Include="Serilog.Sinks.File" Version="6.0.0"/>
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2"/>
     </ItemGroup>
 
     <ItemGroup>
-      <Content Update="Resources\aaa.mp4">
-        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-      </Content>
+        <Content Update="Resources\aaa.mp4">
+            <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+        </Content>
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Resources\Books\" />
+        <Folder Include="Resources\Books\"/>
     </ItemGroup>
 
 </Project>

@@ -5,7 +5,6 @@ namespace PandaKidsServer.DB.Operators;
 
 public class VideoSuitOperator : CollectionOperator<VideoSuit>
 {
-    public VideoSuitOperator(AppContext ctx, IMongoCollection<VideoSuit> collection) : base(ctx, collection)
-    {
+    public VideoSuitOperator(AppContext ctx, IMongoCollection<VideoSuit> collection) : base(ctx, collection) {
     }
 }

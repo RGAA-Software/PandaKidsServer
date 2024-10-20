@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.FileProviders;
 using PandaKidsServer.Common;
 using PandaKidsServer.Handlers;
@@ -8,7 +9,7 @@ using AppContext = PandaKidsServer.AppContext;
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Debug()
     .Enrich.FromLogContext()
-    .WriteTo.File("logs/app.log", 
+    .WriteTo.File("logs/app.log",
         rollingInterval: RollingInterval.Day,
         shared: true
     ).CreateLogger();
@@ -23,11 +24,15 @@ builder.Services.AddSingleton(appContext);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.Limits.MaxRequestBodySize = 512 * 1024 * 1024;
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
+if (app.Environment.IsDevelopment()) {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
@@ -39,10 +44,9 @@ app.UseWebSockets();
 
 Console.WriteLine("Directory.GetCurrentDirectory(): " + Directory.GetCurrentDirectory());
 app.UseStaticFiles();
-app.UseStaticFiles(new StaticFileOptions
-{
+app.UseStaticFiles(new StaticFileOptions {
     FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Resources")),
-     RequestPath = "/Resources"
+    RequestPath = "/Resources"
 });
 
 // app.UseDirectoryBrowser(new DirectoryBrowserOptions
@@ -51,19 +55,13 @@ app.UseStaticFiles(new StaticFileOptions
 //     RequestPath = "/Resources"
 // });
 
-app.Use(async (context, next) =>
-{
-    if (context.Request.Path == "/ws")
-    {
+app.Use(async (context, next) => {
+    if (context.Request.Path == "/ws") {
         string? id = context.Request.Query["id"];
-        if (Common.IsEmpty(id))
-        {
-            return;
-        }
+        if (Common.IsEmpty(id)) return;
         Console.WriteLine("ID: " + id);
-        
-        if (context.WebSockets.IsWebSocketRequest)
-        {
+
+        if (context.WebSockets.IsWebSocketRequest) {
             var websocket = await context.WebSockets.AcceptWebSocketAsync();
             var handler = new WebSocketHandler(appContext);
             var user = OnlineUser.Make(appContext, handler, id!);
@@ -71,16 +69,16 @@ app.Use(async (context, next) =>
             userMgr.AddUser(user);
             await handler.Handle(websocket, id!);
         }
-        else
-        {
+        else {
             context.Response.StatusCode = 400;
         }
     }
-    else
-    {
+    else {
         await next();
     }
 });
+
+
 
 Log.Information("----> RUN <----");
 app.Run();

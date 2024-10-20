@@ -5,69 +5,59 @@ using Serilog;
 
 namespace PandaKidsServer.DB.Operators;
 
-public abstract class CollectionOperator<T> where T: Entity
+public abstract class CollectionOperator<T> where T : Entity
 {
-    private readonly AppContext _appContext;
-    private readonly IMongoCollection<T> _collection;
-    
-    public CollectionOperator(AppContext ctx, IMongoCollection<T> collection)
-    {
-        _appContext = ctx;
-        _collection = collection;
+    protected readonly AppContext AppContext;
+    protected readonly IMongoCollection<T> Collection;
+
+    public CollectionOperator(AppContext ctx, IMongoCollection<T> collection) {
+        AppContext = ctx;
+        Collection = collection;
         // var indexKeysDefinition = Builders<T>.IndexKeys.Ascending("Eid");
         // var createIndexModel = new CreateIndexModel<T>(indexKeysDefinition, new CreateIndexOptions { Unique = true });
         // var indexName = collection.Indexes.CreateOne(createIndexModel);
     }
 
-    public string InsertEntity(T entity)
-    {
-        try
-        {
-            _collection.InsertOne(entity);
+    public string InsertEntity(T entity) {
+        try {
+            Collection.InsertOne(entity);
             return entity.Id.ToString();
         }
-        catch (Exception e)
-        {
+        catch (Exception e) {
             Log.Error("Insert error:" + entity + " because of : " + e.Message);
             return "";
         }
     }
 
-    public void DeleteEntity(string id)
-    {
-        _collection.DeleteOne(new BsonDocument("Eid", BsonObjectId.Create(id)));
+    public void DeleteEntity(string id) {
+        Collection.DeleteOne(new BsonDocument("Eid", BsonObjectId.Create(id)));
     }
 
-    public bool UpdateEntity(string id, Dictionary<string, object> value)
-    {
+    public bool UpdateEntity(string id, Dictionary<string, object> value) {
         var filter = Builders<T>.Filter.Eq("Eid", BsonObjectId.Create(id));
-        var result = _collection.UpdateOne(filter, 
-            new BsonDocument("$set", new BsonDocument(value)), 
+        var result = Collection.UpdateOne(filter,
+            new BsonDocument("$set", new BsonDocument(value)),
             new UpdateOptions { IsUpsert = true });
         return result.ModifiedCount > 0;
     }
-    
-    public T? FindEntityById(string id)
-    {
+
+    public T? FindEntityById(string id) {
         var filter = Builders<T>.Filter;
-        return _collection.Find(filter.Eq("Eid", BsonObjectId.Create(id))).FirstOrDefault();
+        return Collection.Find(filter.Eq("Eid", BsonObjectId.Create(id))).FirstOrDefault();
     }
 
-    public List<T> QueryEntity(int page, int pageSize)
-    {
+    public List<T> QueryEntity(int page, int pageSize) {
         var filter = Builders<T>.Filter.Empty;
-        var docs = _collection.Find(filter)
+        var docs = Collection.Find(filter)
             .Skip((page - 1) * pageSize)
             .Limit(pageSize)
-            .ToList<T>();
+            .ToList();
         return docs;
     }
 
-    public long CountTotalEntities()
-    {
+    public long CountTotalEntities() {
         var filter = Builders<T>.Filter.Empty;
-        var totalRecords = _collection.CountDocuments(filter);
+        var totalRecords = Collection.CountDocuments(filter);
         return totalRecords;
     }
-
 }

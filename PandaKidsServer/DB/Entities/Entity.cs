@@ -6,20 +6,20 @@ namespace PandaKidsServer.DB.Entities;
 
 public abstract class Entity
 {
-    [BsonElement("_id")]
+    [BsonElement("_id")] 
     public ObjectId Id = ObjectId.GenerateNewId();
-
-    public string Name = "";
+    
+    public string Author = "";
 
     public string CoverPath = "";
 
+    public string Name = "";
+
     public string Summary = "";
 
-    public string Author = "";
+    public string FilePath = "";
     
-    public string ToJson()
-    {
+    public string ToJson() {
         return JsonConvert.SerializeObject(this);
     }
-
 }

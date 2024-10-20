@@ -1,7 +1,7 @@
 ﻿namespace PandaKidsServer.DB.Entities;
 
 /// <summary>
-/// a suit of video
+///     a suit of video
 /// </summary>
 public class VideoSuit : Entity
 {
