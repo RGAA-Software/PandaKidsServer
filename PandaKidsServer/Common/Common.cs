@@ -43,4 +43,17 @@ public static class Common
     public static bool IsEmpty(string? value) {
         return value == null || value.Length <= 0;
     }
+
+    public static int AsInt(string? value) {
+        try {
+            return int.Parse(value!);
+        }
+        catch (Exception e) {
+            return int.MinValue;
+        }
+    }
+
+    public static bool IsValidInt(int value) {
+        return value != int.MinValue;
+    }
 }

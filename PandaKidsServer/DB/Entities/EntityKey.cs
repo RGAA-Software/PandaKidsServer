@@ -23,8 +23,16 @@ public class EntityKey
     // form
     public const string KeyVideoFile = "VideoFile";
     
+    // Page
+    public const string KeyPage = "Page";
+    
+    // PageSize
+    public const string KeyPageSize = "PageSize";
+    
     // response
+    public const string RespCount = "Count";
     public const string RespBook = "Book";
+    public const string RespBooks = "Books";
     public const string RespBookSuit = "BookSuit";
     public const string RespAudio = "Audio";
     public const string RespAudioSuit = "AudioSuit";

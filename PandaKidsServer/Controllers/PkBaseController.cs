@@ -80,7 +80,8 @@ public class PkBaseController : ControllerBase
         if (targetPath == null)
             return new BasicPair<IActionResult?, BasicPath?>(
                 RespError(ControllerError.ErrCopyFileFailed, targetPath), null);
-        var paths = new BasicPath(targetPath, Path.Combine(ResManager.GetBookRefPath(), file.FileName), file.FileName);
+        var paths = new BasicPath(targetPath, Path.Combine(ResManager.GetBookRefPath(), file.FileName), 
+            Path.GetFileNameWithoutExtension(targetPath));
         return new BasicPair<IActionResult?, BasicPath?>(null, paths);
     }
 
@@ -93,7 +94,8 @@ public class PkBaseController : ControllerBase
         if (targetPath == null)
             return new BasicPair<IActionResult?, BasicPath?>(
                 RespError(ControllerError.ErrCopyFileFailed, targetPath), null);
-        var paths = new BasicPath(targetPath, Path.Combine(ResManager.GetImageRefPath(), file.FileName), file.FileName);
+        var paths = new BasicPath(targetPath, Path.Combine(ResManager.GetImageRefPath(), file.FileName), 
+            Path.GetFileNameWithoutExtension(targetPath));
         return new BasicPair<IActionResult?, BasicPath?>(null, paths);
     }
 
@@ -121,7 +123,8 @@ public class PkBaseController : ControllerBase
         if (targetPath == null)
             return new BasicPair<IActionResult?, BasicPath?>(
                 RespError(ControllerError.ErrCopyFileFailed, targetPath), null);
-        var paths = new BasicPath(targetPath, Path.Combine(ResManager.GetVideoRefPath(), file.FileName), file.FileName);
+        var paths = new BasicPath(targetPath, Path.Combine(ResManager.GetVideoRefPath(), file.FileName), 
+            Path.GetFileNameWithoutExtension(targetPath));
         return new BasicPair<IActionResult?, BasicPath?>(null, paths);
     }
 
@@ -149,7 +152,8 @@ public class PkBaseController : ControllerBase
         if (targetPath == null)
             return new BasicPair<IActionResult?, BasicPath?>(
                 RespError(ControllerError.ErrCopyFileFailed, targetPath), null);
-        var paths = new BasicPath(targetPath, Path.Combine(ResManager.GetAudioRefPath(), file.FileName), file.FileName);
+        var paths = new BasicPath(targetPath, Path.Combine(ResManager.GetAudioRefPath(), file.FileName), 
+            Path.GetFileNameWithoutExtension(targetPath));
         return new BasicPair<IActionResult?, BasicPath?>(null, paths);
     }
 

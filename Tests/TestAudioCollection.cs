@@ -67,7 +67,7 @@ public class TestAudioCollection
     [Test]
     public void TestQueryAudio()
     {
-        var audios =_audioOperator.QueryEntity(2, 3);
+        var audios =_audioOperator.QueryEntities(2, 3);
         Assert.NotNull(audios);
         foreach (var audio in audios)
         {

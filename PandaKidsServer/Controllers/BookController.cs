@@ -132,4 +132,72 @@ public class BookController : PkBaseController
         BookOperator.InsertEntity(book);
         return RespOkData(EntityKey.RespBook, book);
     }
+
+    [HttpGet("query")]
+    public async Task<IActionResult> QueryBooks() {
+        int page = AsInt(Request.Query[EntityKey.KeyPage]);
+        int pageSize = AsInt(Request.Query[EntityKey.KeyPageSize]);
+        if (!IsValidInt(page) || !IsValidInt(pageSize)) {
+            return RespError(ControllerError.ErrParamErr);
+        }
+
+        var books = BookOperator.QueryEntities(page, pageSize);
+        FillInBooks(books);
+        
+        return RespOkData(EntityKey.RespBooks, books);
+    }
+
+    [HttpGet("query/like/name")]
+    public async Task<IActionResult> QueryBooksLikeName() {
+        string? name = Request.Query[EntityKey.KeyName];
+        if (IsEmpty(name)) {
+            return RespError(ControllerError.ErrParamErr);
+        }
+
+        var books = BookOperator.QueryEntities(name!);
+        FillInBooks(books);
+        return RespOkData(EntityKey.RespBooks, books);
+    }
+
+    [HttpGet("delete/{id}")]
+    public async Task<IActionResult> DeleteBook(string id) {
+        if (IsEmpty(id)) {
+            return RespError(ControllerError.ErrParamErr);
+        }
+        return BookOperator.DeleteEntity(id) ? RespOk() : RespError(ControllerError.ErrDeleteFailed);
+    }
+    
+    [HttpGet("count")]
+    public async Task<IActionResult> CountBook() {
+        return RespOkValue(BookOperator.CountTotalEntities());
+    }
+
+    [HttpPost("update")]
+    public async Task<IActionResult> UpdateBook(IFormCollection form) {
+
+        return RespOk();
+    }
+    
+    private void FillInBooks(List<Book>? books) {
+        if (books == null) {
+            return;
+        }
+
+        foreach (var book in books) {
+            foreach (var bookAudioId in book.AudioIds) {
+                var audio = AudioOperator.FindEntityById(bookAudioId);
+                Console.WriteLine("id: " + bookAudioId + ", audio: " + audio);
+                if (audio != null) {
+                    book.Audios.Add(audio);
+                }
+            }
+
+            foreach (var bookVideoId in book.VideoIds) {
+                var video = VideoOperator.FindEntityById(bookVideoId);
+                if (video != null) {
+                    book.Videos.Add(video);
+                }
+            }
+        }
+    }
 }
