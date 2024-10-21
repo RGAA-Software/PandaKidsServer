@@ -103,13 +103,13 @@ public class BookController : PkBaseController
         var details = GetFormValue(form, EntityKey.KeyDetails);
 
         var book = new Book {
-            Author = author,
+            Author = author ?? "",
             Cover = coverPath.RefPath,
             CoverId = coverPath.Extra == null ? "" : coverPath.Extra!,
-            Name = name.Length <= 0 ? pdfPath.Name : name,
-            Summary = summary,
-            Content = content,
-            Details = details,
+            Name = name ?? pdfPath.Name,
+            Summary = summary ?? "",
+            Content = content ?? "",
+            Details = details ?? "",
             File = pdfPath.RefPath,
         };
         
@@ -172,9 +172,135 @@ public class BookController : PkBaseController
         return RespOkValue(BookOperator.CountTotalEntities());
     }
 
+    // todo : Test it
     [HttpPost("update")]
     public async Task<IActionResult> UpdateBook(IFormCollection form) {
+        var id = GetFormValue(form, EntityKey.KeyId);
+        var author = GetFormValue(form, EntityKey.KeyAuthor);
+        var name = GetFormValue(form, EntityKey.KeyName);
+        var summary = GetFormValue(form, EntityKey.KeySummary);
+        var content = GetFormValue(form, EntityKey.KeyContent);
+        var details = GetFormValue(form, EntityKey.KeyDetails);
+        var book = BookOperator.FindEntityById(id);
+        if (book == null) {
+            return RespError(ControllerError.ErrNoRecordInDb);
+        }
 
+        if (author != null) {
+            book.Author = author;
+        }
+        if (name != null) {
+            book.Name = name;
+        }
+        if (summary != null) {
+            book.Summary = summary;
+        }
+        if (content != null) {
+            book.Content = content;
+        }
+        if (details != null) {
+            book.Details = details;
+        }
+
+        BasicPath? pdfPath;
+        // * pdf
+        {
+            var ret = await CopyBook(form, EntityKey.KeyFile);
+            pdfPath = ret.Val;
+        }
+
+        BasicPath? coverPath = null;
+        // * cover
+        {
+            var ret = await CopyImage(form, EntityKey.KeyCoverFile);
+            if (ret.Val != null) {
+                coverPath = ret.Val!;
+                var image = ImageOperator.FindEntityById(book.CoverId);
+                if (image == null) {
+                    // insert to db
+                    var entity = ImageOperator.InsertEntityIfNotExistByFile(new Image {
+                        Name = coverPath.Name,
+                        File = coverPath.RefPath,
+                    });
+                    if (entity == null) {
+                        return RespError(ControllerError.ErrFileAlreadyExist);
+                    }
+                    coverPath.Extra = entity.GetId();
+                }
+                else {
+                    image.Name = coverPath.Name;
+                    image.File = coverPath.RefPath;
+                    ImageOperator.ReplaceEntity(image);
+                    coverPath.Extra = book.CoverId;
+                }
+            }
+        }
+
+        if (pdfPath != null) {
+            book.File = pdfPath.RefPath;
+        }
+
+        if (coverPath != null) {
+            book.Cover = coverPath.RefPath;
+            book.CoverId = coverPath.Extra!;
+        }
+
+        if (!BookOperator.ReplaceEntity(book)) {
+            return RespError(ControllerError.ErrReplaceInDbFailed);
+        }
+
+        return RespOk();
+    }
+
+    [HttpPost("delete/audio")]
+    public async Task<IActionResult> DeleteAudio(IFormCollection form) {
+        var entityId = GetFormValue(form, EntityKey.KeyId);
+        var audioId = GetFormValue(form, EntityKey.KeyAudioId);
+        if (IsEmpty(entityId) || IsEmpty(audioId)) {
+            return RespError(ControllerError.ErrParamErr);
+        }
+
+        var book = BookOperator.FindEntityById(entityId!);
+        if (book == null) {
+            return RespError(ControllerError.ErrNoRecordInDb);
+        }
+
+        book.AudioIds.Remove(audioId!);
+        if (!BookOperator.ReplaceEntity(book)) {
+            return RespError(ControllerError.ErrReplaceInDbFailed);
+        }
+        return RespOk();
+    }
+    
+    [HttpPost("delete/video")]
+    public async Task<IActionResult> DeleteVideo(IFormCollection form) {
+        var entityId = GetFormValue(form, EntityKey.KeyId);
+        var videoId = GetFormValue(form, EntityKey.KeyVideoId);
+        if (IsEmpty(entityId) || IsEmpty(videoId)) {
+            return RespError(ControllerError.ErrParamErr);
+        }
+
+        var book = BookOperator.FindEntityById(entityId!);
+        if (book == null) {
+            return RespError(ControllerError.ErrNoRecordInDb);
+        }
+
+        book.VideoIds.Remove(videoId!);
+        if (!BookOperator.ReplaceEntity(book)) {
+            return RespError(ControllerError.ErrReplaceInDbFailed);
+        }
+        return RespOk();
+    }
+    
+    
+    [HttpPost("add/audio")]
+    public async Task<IActionResult> AddAudio(IFormCollection form) {
+        return RespOk();
+    }
+    
+    
+    [HttpPost("add/video")]
+    public async Task<IActionResult> AddVideo(IFormCollection form) {
         return RespOk();
     }
     

@@ -53,6 +53,11 @@ public abstract class CollectionOperator<T> where T : Entity
         return result.ModifiedCount > 0;
     }
 
+    public bool ReplaceEntity(T entity) {
+        var result = Collection.ReplaceOne(Builders<T>.Filter.Eq("_id", BsonObjectId.Create(entity.Id)), entity);
+        return result.MatchedCount > 0;
+    }
+
     public T? FindEntityById(string id) {
         var filter = Builders<T>.Filter;
         return Collection.Find(filter.Eq("_id", BsonObjectId.Create(id))).FirstOrDefault();

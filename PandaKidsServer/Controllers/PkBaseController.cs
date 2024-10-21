@@ -157,8 +157,8 @@ public class PkBaseController : ControllerBase
         return new BasicPair<IActionResult?, BasicPath?>(null, paths);
     }
 
-    protected string GetFormValue(IFormCollection form, string key) {
-        return form.TryGetValue(key, out var value) ? value.ToString() : "";
+    protected string? GetFormValue(IFormCollection form, string key) {
+        return form.TryGetValue(key, out var value) ? value.ToString() : null;
     }
 
     protected Dictionary<string, object> MakeRespData(string name, object data) {

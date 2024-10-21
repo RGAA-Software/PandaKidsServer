@@ -28,6 +28,10 @@ public class EntityKey
     
     // PageSize
     public const string KeyPageSize = "PageSize";
+
+    public const string KeyAudioId = "AudioId";
+
+    public const string KeyVideoId = "VideoId";
     
     // response
     public const string RespCount = "Count";
