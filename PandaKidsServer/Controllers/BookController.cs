@@ -186,7 +186,6 @@ public class BookController : PkBaseController
         foreach (var book in books) {
             foreach (var bookAudioId in book.AudioIds) {
                 var audio = AudioOperator.FindEntityById(bookAudioId);
-                Console.WriteLine("id: " + bookAudioId + ", audio: " + audio);
                 if (audio != null) {
                     book.Audios.Add(audio);
                 }
