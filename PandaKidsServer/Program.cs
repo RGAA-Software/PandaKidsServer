@@ -26,7 +26,7 @@ builder.Services.AddSwaggerGen();
 
 builder.WebHost.ConfigureKestrel(options =>
 {
-    options.Limits.MaxRequestBodySize = 512 * 1024 * 1024;
+    options.Limits.MaxRequestBodySize = 1 * 1024 * 1024 * 1024;
 });
 
 var app = builder.Build();

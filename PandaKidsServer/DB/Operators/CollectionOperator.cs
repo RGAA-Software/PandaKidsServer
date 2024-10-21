@@ -18,15 +18,20 @@ public abstract class CollectionOperator<T> where T : Entity
         // var indexName = collection.Indexes.CreateOne(createIndexModel);
     }
 
-    public string InsertEntity(T entity) {
+    public T? InsertEntity(T entity) {
         try {
             Collection.InsertOne(entity);
-            return entity.Id.ToString();
+            return entity;
         }
         catch (Exception e) {
             Log.Error("Insert error:" + entity + " because of : " + e.Message);
-            return "";
+            return null;
         }
+    }
+
+    public T? InsertEntityIfNotExistByFile(T entity) {
+        var e = FindFilePath(entity.File);
+        return e ?? InsertEntity(entity);
     }
 
     public void DeleteEntity(string id) {
@@ -59,5 +64,9 @@ public abstract class CollectionOperator<T> where T : Entity
         var filter = Builders<T>.Filter.Empty;
         var totalRecords = Collection.CountDocuments(filter);
         return totalRecords;
+    }
+    
+    public T? FindFilePath(string path) {
+        return Collection.Find(Builders<T>.Filter.Eq(EntityKey.KeyFile, path)).FirstOrDefault();
     }
 }

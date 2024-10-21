@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace PandaKidsServer.Common;
 
-public class Common
+public static class Common
 {
     public static string GetCurrentTime() {
         return DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss:fff");

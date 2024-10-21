@@ -11,15 +11,23 @@ public abstract class Entity
     
     public string Author = "";
 
-    public string CoverPath = "";
+    // Ref path
+    public string Cover = "";
+    // id
+    public string CoverId = "";
 
     public string Name = "";
 
     public string Summary = "";
 
-    public string FilePath = "";
+    // Ref path
+    public string File = ""; 
     
     public string ToJson() {
         return JsonConvert.SerializeObject(this);
+    }
+
+    public string GetId() {
+        return Id.ToString();
     }
 }

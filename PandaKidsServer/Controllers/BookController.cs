@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PandaKidsServer.Common;
 using PandaKidsServer.DB.Entities;
 using PandaKidsServer.DB.Operators;
+using Serilog;
+using static PandaKidsServer.Common.Common;
+using static PandaKidsServer.Common.BasicType;
 
 namespace PandaKidsServer.Controllers;
 
@@ -15,39 +17,82 @@ public class BookController : PkBaseController
 
     [HttpPost("insert")]
     public async Task<IActionResult> CreateBook(IFormCollection form) {
-        BasicType.Paths pdfPaths;
+        var inFile = form.Files.GetFile(EntityKey.KeyFile);
+        if (inFile != null) {
+            var inFilePath = Path.Combine(ResManager.GetBookAbsPath(), inFile.FileName);
+            if (System.IO.File.Exists(inFilePath)) {
+                //return RespError(ControllerError.ErrFileAlreadyExist);
+            }
+        }
+
+        BasicPath pdfPath;
         // * pdf
         {
             var ret = await CopyBook(form, EntityKey.KeyFile);
             if (ret.Key != null) return ret.Key;
-            pdfPaths = ret.Val!;
+            pdfPath = ret.Val!;
         }
 
-        BasicType.Paths coverPaths;
+        BasicPath coverPath;
         // * cover
         {
             var ret = await CopyImage(form, EntityKey.KeyCoverFile);
             if (ret.Key != null) return ret.Key;
-            coverPaths = ret.Val!;
+            coverPath = ret.Val!;
+            // insert to db
+            var entity = ImageOperator.InsertEntityIfNotExistByFile(new Image {
+                Name = coverPath.Name,
+                File = coverPath.RefPath,
+            });
+            if (entity == null) {
+                return RespError(ControllerError.ErrFileAlreadyExist);
+            }
+            coverPath.Extra = entity.GetId();
         }
 
-        BasicType.Paths? audioPaths = null;
+        var audioPaths = new List<BasicPath>();
         // audio
         {
-            var ret = await CopyAudio(form, EntityKey.KeyAudioFile);
-            if (ret.Key == null && ret.Val != null) {
-                audioPaths = ret.Val!;
-                // insert to database
+            var audioFiles = FilterAudioFiles(form);
+            foreach (var audioFile in audioFiles) {
+                var ret = await CopyAudio(audioFile);
+                if (ret.Key == null && ret.Val != null) {
+                    var audioPath = ret.Val!;
+                    audioPaths.Add(audioPath);
+                    // insert to database
+                    var entity = AudioOperator.InsertEntityIfNotExistByFile(new Audio {
+                        Name = audioPath.Name,
+                        File = audioPath.RefPath,
+                    });
+                    if (entity == null) {
+                        Log.Error("Insert " + audioPath.Name + " to db failed");
+                        continue;
+                    }
+                    audioPath.Extra = entity.GetId();
+                }   
             }
         }
 
-        BasicType.Paths? videoPaths = null;
+        var videoPaths = new List<BasicPath>();
         // video
         {
-            var ret = await CopyVideo(form, EntityKey.KeyVideoFile);
-            if (ret.Key == null && ret.Val != null) {
-                videoPaths = ret.Val!;
-                // insert to database
+            var videoFiles = FilterVideoFiles(form);
+            foreach (var videoFile in videoFiles) {
+                var ret = await CopyVideo(videoFile);
+                if (ret.Key == null && ret.Val != null) {
+                    var videoPath = ret.Val!;
+                    videoPaths.Add(videoPath);
+                    // insert to database
+                    var entity = VideoOperator.InsertEntityIfNotExistByFile(new Video {
+                        Name = videoPath.Name,
+                        File = videoPath.RefPath,
+                    });
+                    if (entity == null) {
+                        Log.Error("Insert " + videoPath.Name + " to db failed");
+                        continue;
+                    }
+                    videoPath.Extra = entity.GetId();
+                }   
             }
         }
 
@@ -59,17 +104,30 @@ public class BookController : PkBaseController
 
         var book = new Book {
             Author = author,
-            CoverPath = coverPaths.RefPath,
-            Name = name.Length <= 0 ? pdfPaths.Name : name,
+            Cover = coverPath.RefPath,
+            CoverId = coverPath.Extra == null ? "" : coverPath.Extra!,
+            Name = name.Length <= 0 ? pdfPath.Name : name,
             Summary = summary,
             Content = content,
             Details = details,
-            FilePath = pdfPaths.RefPath,
-
+            File = pdfPath.RefPath,
         };
-        var existBook = BookOperator.FindBookByPdfPath(book.FilePath);
+        
+        foreach (var audioPath in audioPaths) {
+            if (audioPath.Extra != null) {
+                book.AudioIds.Add(audioPath.Extra!);   
+            }
+        }
+
+        foreach (var videoPath in videoPaths) {
+            if (videoPath.Extra != null) {
+                book.VideoIds.Add(videoPath.Extra!);
+            }
+        }
+        
+        var existBook = BookOperator.FindFilePath(book.File);
         if (existBook != null) {
-            return RespError(ControllerError.ErrAlreadyExist);
+            return RespError(ControllerError.ErrRecordAlreadyExist);
         }
         BookOperator.InsertEntity(book);
         return RespOkData(EntityKey.RespBook, book);

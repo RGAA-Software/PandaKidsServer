@@ -1,10 +1,10 @@
 ﻿namespace PandaKidsServer.Common;
 
-public class BasicType
+public static class BasicType
 {
-    public class Pair<TK, TV>
+    public class BasicPair<TK, TV>
     {
-        public Pair(TK k, TV v) {
+        public BasicPair(TK k, TV v) {
             Key = k;
             Val = v;
         }
@@ -13,13 +13,14 @@ public class BasicType
         public TV Val { set; get; }
     }
 
-    public class Paths
+    public class BasicPath
     {
         public string AbsPath;
         public string RefPath;
         public string Name;
+        public string? Extra = null;
 
-        public Paths(string absPath, string refPath, string name) {
+        public BasicPath(string absPath, string refPath, string name) {
             AbsPath = absPath;
             RefPath = refPath;
             Name = name;

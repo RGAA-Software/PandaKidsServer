@@ -6,7 +6,11 @@ public class ControllerError
     public const int ErrParamErr = 600;
     public const int ErrNoFile = 601;
     public const int ErrCopyFileFailed = 602;
-    public const int ErrAlreadyExist = 603;
+    public const int ErrRecordAlreadyExist = 603;
+    public const int ErrFileAlreadyExist = 604;
+    public const int ErrInsertImageFailed = 605;
+    public const int ErrInsertVideoFailed = 606;
+    public const int ErrInsertAudioFailed = 607;
 
     public static string Error2String(int code) {
         switch (code) {
@@ -14,7 +18,11 @@ public class ControllerError
             case ErrParamErr: return "Error param";
             case ErrNoFile: return "No file";
             case ErrCopyFileFailed: return "Copy file failed";
-            case ErrAlreadyExist: return "Already exist";
+            case ErrRecordAlreadyExist: return "Record already exists in db";
+            case ErrFileAlreadyExist: return "File already exists";
+            case ErrInsertImageFailed: return "Insert image failed";
+            case ErrInsertVideoFailed: return "Insert video failed";
+            case ErrInsertAudioFailed: return "Insert audio failed";
         }
 
         return "Unknown Error: " + code;
