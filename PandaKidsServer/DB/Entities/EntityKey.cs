@@ -2,7 +2,7 @@
 
 public class EntityKey
 {
-    public const string KeyId = "_id";
+    public const string KeyId = "Id";
     public const string KeyName = "Name";
     public const string KeyAuthor = "Author";
     public const string KeySummary = "Summary";
