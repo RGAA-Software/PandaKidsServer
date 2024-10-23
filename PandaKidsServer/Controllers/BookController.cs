@@ -8,7 +8,7 @@ using static PandaKidsServer.Common.BasicType;
 namespace PandaKidsServer.Controllers;
 
 [ApiController]
-[Route("book")]
+[Route("pandakids/book")]
 public class BookController : PkBaseController
 {
     public BookController(AppContext ctx) : base(ctx) {
@@ -40,7 +40,7 @@ public class BookController : PkBaseController
             if (ret.Key != null) return ret.Key;
             coverPath = ret.Val!;
             // insert to db
-            var entity = ImageOperator.InsertEntityIfNotExistByFile(new Image {
+            var entity = ImageOp.InsertEntityIfNotExistByFile(new Image {
                 Name = coverPath.Name,
                 File = coverPath.RefPath,
             });
@@ -60,7 +60,7 @@ public class BookController : PkBaseController
                     var audioPath = ret.Val!;
                     audioPaths.Add(audioPath);
                     // insert to database
-                    var entity = AudioOperator.InsertEntityIfNotExistByFile(new Audio {
+                    var entity = AudioOp.InsertEntityIfNotExistByFile(new Audio {
                         Name = audioPath.Name,
                         File = audioPath.RefPath,
                     });
@@ -83,7 +83,7 @@ public class BookController : PkBaseController
                     var videoPath = ret.Val!;
                     videoPaths.Add(videoPath);
                     // insert to database
-                    var entity = VideoOperator.InsertEntityIfNotExistByFile(new Video {
+                    var entity = VideoOp.InsertEntityIfNotExistByFile(new Video {
                         Name = videoPath.Name,
                         File = videoPath.RefPath,
                     });
@@ -125,11 +125,11 @@ public class BookController : PkBaseController
             }
         }
         
-        var existBook = BookOperator.FindFilePath(book.File);
+        var existBook = BookOp.FindEntityByFilePath(book.File);
         if (existBook != null) {
             return RespError(ControllerError.ErrRecordAlreadyExist);
         }
-        BookOperator.InsertEntity(book);
+        BookOp.InsertEntity(book);
         return RespOkData(EntityKey.RespBook, book);
     }
 
@@ -141,7 +141,7 @@ public class BookController : PkBaseController
             return RespError(ControllerError.ErrParamErr);
         }
 
-        var books = BookOperator.QueryEntities(page, pageSize);
+        var books = BookOp.QueryEntities(page, pageSize);
         FillInBooks(books);
         
         return RespOkData(EntityKey.RespBooks, books);
@@ -154,22 +154,23 @@ public class BookController : PkBaseController
             return RespError(ControllerError.ErrParamErr);
         }
 
-        var books = BookOperator.QueryEntities(name!);
+        var books = BookOp.QueryEntities(name!);
         FillInBooks(books);
         return RespOkData(EntityKey.RespBooks, books);
     }
 
-    [HttpGet("delete/{id}")]
-    public async Task<IActionResult> DeleteBook(string id) {
+    [HttpGet("delete")]
+    public async Task<IActionResult> DeleteBook() {
+        string? id = Request.Query[EntityKey.KeyId];
         if (IsEmpty(id)) {
             return RespError(ControllerError.ErrParamErr);
         }
-        return BookOperator.DeleteEntity(id) ? RespOk() : RespError(ControllerError.ErrDeleteFailed);
+        return BookOp.DeleteEntity(id!) ? RespOk() : RespError(ControllerError.ErrDeleteFailed);
     }
     
     [HttpGet("count")]
     public async Task<IActionResult> CountBook() {
-        return RespOkValue(BookOperator.CountTotalEntities());
+        return RespOkValue(BookOp.CountTotalEntities());
     }
     
     [HttpPost("update")]
@@ -180,7 +181,7 @@ public class BookController : PkBaseController
         var summary = GetFormValue(form, EntityKey.KeySummary);
         var content = GetFormValue(form, EntityKey.KeyContent);
         var details = GetFormValue(form, EntityKey.KeyDetails);
-        var book = BookOperator.FindEntityById(id);
+        var book = BookOp.FindEntityById(id);
         if (book == null) {
             return RespError(ControllerError.ErrNoRecordInDb);
         }
@@ -214,10 +215,10 @@ public class BookController : PkBaseController
             var ret = await CopyImage(form, EntityKey.KeyCoverFile);
             if (ret.Val != null) {
                 coverPath = ret.Val!;
-                var image = ImageOperator.FindEntityById(book.CoverId);
+                var image = ImageOp.FindEntityById(book.CoverId);
                 if (image == null) {
                     // insert to db
-                    var entity = ImageOperator.InsertEntityIfNotExistByFile(new Image {
+                    var entity = ImageOp.InsertEntityIfNotExistByFile(new Image {
                         Name = coverPath.Name,
                         File = coverPath.RefPath,
                     });
@@ -229,7 +230,7 @@ public class BookController : PkBaseController
                 else {
                     image.Name = coverPath.Name;
                     image.File = coverPath.RefPath;
-                    ImageOperator.ReplaceEntity(image);
+                    ImageOp.ReplaceEntity(image);
                     coverPath.Extra = book.CoverId;
                 }
             }
@@ -244,7 +245,7 @@ public class BookController : PkBaseController
             book.CoverId = coverPath.Extra!;
         }
 
-        if (!BookOperator.ReplaceEntity(book)) {
+        if (!BookOp.ReplaceEntity(book)) {
             return RespError(ControllerError.ErrReplaceInDbFailed);
         }
 
@@ -259,13 +260,13 @@ public class BookController : PkBaseController
             return RespError(ControllerError.ErrParamErr);
         }
 
-        var book = BookOperator.FindEntityById(entityId!);
+        var book = BookOp.FindEntityById(entityId!);
         if (book == null) {
             return RespError(ControllerError.ErrNoRecordInDb);
         }
 
         book.AudioIds.Remove(audioId!);
-        if (!BookOperator.ReplaceEntity(book)) {
+        if (!BookOp.ReplaceEntity(book)) {
             return RespError(ControllerError.ErrReplaceInDbFailed);
         }
         return RespOk();
@@ -279,13 +280,13 @@ public class BookController : PkBaseController
             return RespError(ControllerError.ErrParamErr);
         }
 
-        var book = BookOperator.FindEntityById(entityId!);
+        var book = BookOp.FindEntityById(entityId!);
         if (book == null) {
             return RespError(ControllerError.ErrNoRecordInDb);
         }
 
         book.VideoIds.Remove(videoId!);
-        if (!BookOperator.ReplaceEntity(book)) {
+        if (!BookOp.ReplaceEntity(book)) {
             return RespError(ControllerError.ErrReplaceInDbFailed);
         }
         return RespOk();
@@ -302,7 +303,7 @@ public class BookController : PkBaseController
         if (IsEmpty(id)) {
             return RespError(ControllerError.ErrParamErr);
         }
-        var book = BookOperator.FindEntityById(id!);
+        var book = BookOp.FindEntityById(id!);
         if (book == null) {
             return RespError(ControllerError.ErrNoRecordInDb);
         }
@@ -314,7 +315,7 @@ public class BookController : PkBaseController
                 var audioPath = ret.Val!;
                 audioPaths.Add(audioPath);
                 // insert to database
-                var entity = AudioOperator.InsertEntityIfNotExistByFile(new Audio {
+                var entity = AudioOp.InsertEntityIfNotExistByFile(new Audio {
                     Name = audioPath.Name,
                     File = audioPath.RefPath,
                 });
@@ -335,7 +336,7 @@ public class BookController : PkBaseController
             }
         }
 
-        if (!BookOperator.ReplaceEntity(book)) {
+        if (!BookOp.ReplaceEntity(book)) {
             return RespError(ControllerError.ErrReplaceInDbFailed);
         }
         
@@ -353,7 +354,7 @@ public class BookController : PkBaseController
         if (IsEmpty(id)) {
             return RespError(ControllerError.ErrParamErr);
         }
-        var book = BookOperator.FindEntityById(id!);
+        var book = BookOp.FindEntityById(id!);
         if (book == null) {
             return RespError(ControllerError.ErrNoRecordInDb);
         }
@@ -365,7 +366,7 @@ public class BookController : PkBaseController
                 var videoPath = ret.Val!;
                 videoPaths.Add(videoPath);
                 // insert to database
-                var entity = VideoOperator.InsertEntityIfNotExistByFile(new Video {
+                var entity = VideoOp.InsertEntityIfNotExistByFile(new Video {
                     Name = videoPath.Name,
                     File = videoPath.RefPath,
                 });
@@ -386,7 +387,7 @@ public class BookController : PkBaseController
             }
         }
 
-        if (!BookOperator.ReplaceEntity(book)) {
+        if (!BookOp.ReplaceEntity(book)) {
             return RespError(ControllerError.ErrReplaceInDbFailed);
         }
         return RespOkData(EntityKey.RespBook, book);
@@ -399,14 +400,14 @@ public class BookController : PkBaseController
 
         foreach (var book in books) {
             foreach (var bookAudioId in book.AudioIds) {
-                var audio = AudioOperator.FindEntityById(bookAudioId);
+                var audio = AudioOp.FindEntityById(bookAudioId);
                 if (audio != null) {
                     book.Audios.Add(audio);
                 }
             }
 
             foreach (var bookVideoId in book.VideoIds) {
-                var video = VideoOperator.FindEntityById(bookVideoId);
+                var video = VideoOp.FindEntityById(bookVideoId);
                 if (video != null) {
                     book.Videos.Add(video);
                 }

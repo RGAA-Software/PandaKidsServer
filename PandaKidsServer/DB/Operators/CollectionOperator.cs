@@ -31,7 +31,7 @@ public abstract class CollectionOperator<T> where T : Entity
     }
 
     public T? InsertEntityIfNotExistByFile(T entity) {
-        var e = FindFilePath(entity.File);
+        var e = FindEntityByFilePath(entity.File);
         return e ?? InsertEntity(entity);
     }
 
@@ -58,11 +58,6 @@ public abstract class CollectionOperator<T> where T : Entity
         return result.MatchedCount > 0;
     }
 
-    public T? FindEntityById(string id) {
-        var filter = Builders<T>.Filter;
-        return Collection.Find(filter.Eq("_id", BsonObjectId.Create(id))).FirstOrDefault();
-    }
-
     public List<T> QueryEntities(int page, int pageSize) {
         var filter = Builders<T>.Filter.Empty;
         var docs = Collection.Find(filter)
@@ -85,7 +80,16 @@ public abstract class CollectionOperator<T> where T : Entity
         return totalRecords;
     }
     
-    public T? FindFilePath(string path) {
+    public T? FindEntityById(string id) {
+        var filter = Builders<T>.Filter;
+        return Collection.Find(filter.Eq("_id", BsonObjectId.Create(id))).FirstOrDefault();
+    }
+    
+    public T? FindEntityByFilePath(string path) {
         return Collection.Find(Builders<T>.Filter.Eq(EntityKey.KeyFile, path)).FirstOrDefault();
+    }
+
+    public T? FindEntityByName(string name) {
+        return Collection.Find(Builders<T>.Filter.Eq(EntityKey.KeyName, name)).FirstOrDefault();
     }
 }

@@ -12,19 +12,21 @@ public class PkBaseController : ControllerBase
     protected AppContext AppContext;
     protected readonly Database Database;
     protected readonly ResManager.ResManager ResManager;
-    protected readonly BookOperator BookOperator;
-    protected readonly VideoOperator VideoOperator;
-    protected readonly AudioOperator AudioOperator;
-    protected readonly ImageOperator ImageOperator;
+    protected readonly BookOperator BookOp;
+    protected readonly VideoOperator VideoOp;
+    protected readonly AudioOperator AudioOp;
+    protected readonly ImageOperator ImageOp;
+    protected readonly AudioSuitOperator AudioSuitOp;
     
     public PkBaseController(AppContext ctx) {
         AppContext = ctx;
         ResManager = AppContext.GetResManager();
         Database = AppContext.GetDatabase();
-        BookOperator = Database.GetBookOperator();
-        VideoOperator = Database.GetVideoOperator();
-        AudioOperator = Database.GetAudioOperator();
-        ImageOperator = Database.GetImageOperator();
+        BookOp = Database.GetBookOperator();
+        VideoOp = Database.GetVideoOperator();
+        AudioOp = Database.GetAudioOperator();
+        ImageOp = Database.GetImageOperator();
+        AudioSuitOp = Database.GetAudioSuitOperator();
     }
 
     private IActionResult ResponseMessage(int code, string? extra, Dictionary<string, object> data) {

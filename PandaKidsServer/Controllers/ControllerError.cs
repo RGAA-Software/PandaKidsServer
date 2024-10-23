@@ -14,6 +14,7 @@ public class ControllerError
     public const int ErrDeleteFailed = 608;
     public const int ErrNoRecordInDb = 609;
     public const int ErrReplaceInDbFailed = 610;
+    public const int ErrInsertToDbFailed = 611;
 
     public static string Error2String(int code) {
         switch (code) {
@@ -29,6 +30,7 @@ public class ControllerError
             case ErrDeleteFailed: return "Delete failed";
             case ErrNoRecordInDb: return "No record in db";
             case ErrReplaceInDbFailed: return "Replace in db failed";
+            case ErrInsertToDbFailed: return "Insert to db failed";
         }
 
         return "Unknown Error: " + code;
