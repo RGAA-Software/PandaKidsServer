@@ -154,7 +154,7 @@ public class BookController : PkBaseController
             return RespError(ControllerError.ErrParamErr);
         }
 
-        var books = BookOp.QueryEntities(name!);
+        var books = BookOp.QueryEntitiesLikeName(name!);
         FillInBooks(books);
         return RespOkData(EntityKey.RespBooks, books);
     }

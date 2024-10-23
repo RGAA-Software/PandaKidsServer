@@ -2,19 +2,20 @@
 using Newtonsoft.Json;
 using PandaKidsServer.DB.Entities;
 using PandaKidsServer.DB.Operators;
+using Serilog;
 using static PandaKidsServer.Common.Common;
 using static PandaKidsServer.Common.BasicType;
 
 namespace PandaKidsServer.Controllers;
 
 [ApiController]
-[Route("pandakids/audio/suit")]
+[Route("pandakids/audiosuit")]
 public class AudioSuitController(AppContext ctx) : PkBaseController(ctx)
 {
     private readonly AppContext _appContext = ctx;
 
     [HttpPost("insert")]
-    public async Task<IActionResult> InsertAudio(IFormCollection form) {
+    public async Task<IActionResult> InsertAudioSuit(IFormCollection form) {
         // name
         var name = GetFormValue(form, EntityKey.KeyName);
         // summary
@@ -27,9 +28,6 @@ public class AudioSuitController(AppContext ctx) : PkBaseController(ctx)
         }
 
         var audioSuit = AudioSuitOp.FindEntityByName(name!);
-        if (audioSuit != null) {
-            return RespError(ControllerError.ErrRecordAlreadyExist);
-        }
         
         // cover
         BasicPath? coverPath = null;
@@ -45,23 +43,48 @@ public class AudioSuitController(AppContext ctx) : PkBaseController(ctx)
                 coverPath.Extra = entity.GetId();
             }
         }
+        
+        // add new one
+        if (audioSuit == null) {
+            var newAudioSuit = new AudioSuit {
+                Name = name!,
+                Summary = summary ?? "",
+                Details = details ?? "",
+                Cover = coverPath != null ? coverPath!.RefPath : "",
+                CoverId = coverPath is { Extra: not null } ? coverPath.Extra! : "",
+            };
 
-        var newAudioSuit = new AudioSuit {
-            Name = name!,
-            Summary = summary ?? "",
-            Details = details ?? "",
-            Cover = coverPath != null ? coverPath!.RefPath : "",
-            CoverId = coverPath is { Extra: not null } ? coverPath.Extra! : "",
-        };
+            if (AudioSuitOp.InsertEntity(newAudioSuit) == null) {
+                return RespError(ControllerError.ErrInsertToDbFailed);
+            }
 
-        if (AudioSuitOp.InsertEntity(newAudioSuit) == null) {
-            return RespError(ControllerError.ErrInsertToDbFailed);
+            return RespOk();
         }
-        return RespOk();
+        else {
+            // update exists one
+            audioSuit.Name = name!;
+            if (summary != null) {
+                audioSuit.Summary = summary;
+            }
+            if (details != null) {
+                audioSuit.Details = details;
+            }
+            if (coverPath != null) {
+                audioSuit.Cover = coverPath.RefPath;
+                if (coverPath.Extra != null) {
+                    audioSuit.CoverId = coverPath.Extra!;
+                }
+            }
+            
+            if (!AudioSuitOp.ReplaceEntity(audioSuit)) {
+                return RespError(ControllerError.ErrReplaceInDbFailed);
+            }
+            return RespOk();
+        }
     }
 
     [HttpGet("delete")]
-    public IActionResult DeleteAudio() {
+    public IActionResult DeleteAudioSuit() {
         string? id = Request.Query[EntityKey.KeyId];
         if (IsEmpty(id)) {
             return RespError(ControllerError.ErrParamErr);
@@ -69,13 +92,113 @@ public class AudioSuitController(AppContext ctx) : PkBaseController(ctx)
         return AudioSuitOp.DeleteEntity(id!) ? RespOk() : RespError(ControllerError.ErrDeleteFailed);
     }
 
-    // [HttpGet("query/audio/suit")]
-    // public IActionResult QueryAudio() {
-    //     return Ok();
-    // }
-    //
-    // [HttpGet("query")]
-    // public IActionResult QueryAudios() {
-    //     return Ok();
-    // }
+    [HttpPost("add/audio")]
+    public async Task<IActionResult> AddAudio(IFormCollection form) {
+        var audioFiles = FilterAudioFiles(form);
+        if (audioFiles.Count <= 0) {
+            return RespError(ControllerError.ErrNoFile);
+        }
+        
+        var id = GetFormValue(form, EntityKey.KeyId);
+        if (IsEmpty(id)) {
+            return RespError(ControllerError.ErrParamErr);
+        }
+        var audioSuit = AudioSuitOp.FindEntityById(id!);
+        if (audioSuit == null) {
+            return RespError(ControllerError.ErrNoRecordInDb);
+        }
+
+        var audioPaths = new List<BasicPath>();
+        foreach (var audioFile in audioFiles) {
+            var ret = await CopyAudio(audioFile);
+            if (ret.Key == null && ret.Val != null) {
+                var audioPath = ret.Val!;
+                audioPaths.Add(audioPath);
+                // insert into db
+                var entity = AudioOp.InsertEntityIfNotExistByFile(new Audio {
+                    Name = audioPath.Name,
+                    File = audioPath.RefPath,
+                });
+                if (entity == null) {
+                    Log.Error("Insert " + audioPath.Name + " to db failed.");
+                    continue;
+                }
+                audioPath.Extra = entity.GetId();
+            }
+        }
+        
+        foreach (var audioPath in audioPaths) {
+            if (audioPath.Extra != null) {
+                var audioId = audioPath.Extra!;
+                if (!audioSuit.AudioIds.Contains(audioId)) {
+                    audioSuit.AudioIds.Add(audioId);
+                }
+            }
+        }
+
+        if (!AudioSuitOp.ReplaceEntity(audioSuit)) {
+            return RespError(ControllerError.ErrReplaceInDbFailed);
+        }
+        return RespOk();
+    }
+
+    [HttpPost("delete/audio")]
+    public async Task<IActionResult> DeleteAudio(IFormCollection form) {
+        var entityId = GetFormValue(form, EntityKey.KeyId);
+        var audioId = GetFormValue(form, EntityKey.KeyAudioId);
+        if (IsEmpty(entityId) || IsEmpty(audioId)) {
+            return RespError(ControllerError.ErrParamErr);
+        }
+
+        var audioSuit = AudioSuitOp.FindEntityById(entityId!);
+        if (audioSuit == null) {
+            return RespError(ControllerError.ErrNoRecordInDb);
+        }
+
+        audioSuit.AudioIds.Remove(audioId!);
+        if (!AudioSuitOp.ReplaceEntity(audioSuit)) {
+            return RespError(ControllerError.ErrReplaceInDbFailed);
+        }
+
+        return RespOk();
+    }
+
+    [HttpGet("query")]
+    public IActionResult QueryAudioSuits() {
+        int page = AsInt(Request.Query[EntityKey.KeyPage]);
+        int pageSize = AsInt(Request.Query[EntityKey.KeyPageSize]);
+        if (!IsValidInt(page) || !IsValidInt(pageSize)) {
+            return RespError(ControllerError.ErrParamErr);
+        }
+
+        var audioSuits = AudioSuitOp.QueryEntities(page, pageSize);
+        FillInAudioSuits(audioSuits);
+        return RespOkData(EntityKey.RespAudioSuit, audioSuits);
+    }
+    
+    [HttpGet("query/like/name")]
+    public IActionResult QueryAudioSuitsLikeName() {
+        string? name = Request.Query[EntityKey.KeyName];
+        if (IsEmpty(name)) {
+            return RespError(ControllerError.ErrParamErr);
+        }
+
+        var audioSuits = AudioSuitOp.QueryEntitiesLikeName(name!);
+        FillInAudioSuits(audioSuits);
+        return RespOkData(EntityKey.RespAudioSuits, audioSuits);
+    }
+
+    private void FillInAudioSuits(List<AudioSuit>? audioSuits) {
+        if (audioSuits == null) {
+            return;
+        }
+        foreach (var audioSuit in audioSuits) {
+            foreach (var audioId in audioSuit.AudioIds) {
+                var audio = AudioOp.FindEntityById(audioId);
+                if (audio != null) {
+                    audioSuit.Audios.Add(audio);
+                }
+            }
+        }
+    }
 }

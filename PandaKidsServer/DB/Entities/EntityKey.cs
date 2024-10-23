@@ -40,6 +40,7 @@ public class EntityKey
     public const string RespBookSuit = "BookSuit";
     public const string RespAudio = "Audio";
     public const string RespAudioSuit = "AudioSuit";
+    public const string RespAudioSuits = "AudioSuits";
     public const string RespVideo = "Video";
     public const string RespVideoSuit = "VideoSuit";
     public const string RespUser = "User";

@@ -67,7 +67,7 @@ public abstract class CollectionOperator<T> where T : Entity
         return docs;
     }
 
-    public List<T> QueryEntities(string name) {
+    public List<T> QueryEntitiesLikeName(string name) {
         var regexPattern = new BsonRegularExpression(new Regex(name, RegexOptions.IgnoreCase));
         var filter = Builders<T>.Filter.Regex(x => x.Name, regexPattern);
         var result = Collection.Find(filter).ToList();
