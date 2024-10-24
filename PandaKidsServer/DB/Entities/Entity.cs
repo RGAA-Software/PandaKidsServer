@@ -21,7 +21,9 @@ public abstract class Entity
     public string Summary = "";
 
     // Ref path
-    public string File = ""; 
+    public string File = "";
+
+    public List<string> Categories = [];
     
     public string ToJson() {
         return JsonConvert.SerializeObject(this);

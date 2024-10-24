@@ -83,9 +83,9 @@ public class AudioSuitController(AppContext ctx) : PkBaseController(ctx)
         }
     }
 
-    [HttpGet("delete")]
-    public IActionResult DeleteAudioSuit() {
-        string? id = Request.Query[EntityKey.KeyId];
+    [HttpPost("delete")]
+    public IActionResult DeleteAudioSuit(IFormCollection form) {
+        string? id = GetFormValue(form, EntityKey.KeyId);
         if (IsEmpty(id)) {
             return RespError(ControllerError.ErrParamErr);
         }
@@ -173,7 +173,7 @@ public class AudioSuitController(AppContext ctx) : PkBaseController(ctx)
 
         var audioSuits = AudioSuitOp.QueryEntities(page, pageSize);
         FillInAudioSuits(audioSuits);
-        return RespOkData(EntityKey.RespAudioSuit, audioSuits);
+        return RespOkData(EntityKey.RespAudioSuits, audioSuits);
     }
     
     [HttpGet("query/like/name")]
@@ -188,6 +188,11 @@ public class AudioSuitController(AppContext ctx) : PkBaseController(ctx)
         return RespOkData(EntityKey.RespAudioSuits, audioSuits);
     }
 
+    [HttpPost("add/categories")]
+    public IActionResult AddCategories() {
+        return Ok();
+    }
+    
     private void FillInAudioSuits(List<AudioSuit>? audioSuits) {
         if (audioSuits == null) {
             return;

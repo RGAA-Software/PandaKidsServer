@@ -142,11 +142,40 @@ public class BookSuitController : PkBaseController
 
     [HttpGet("query")]
     public IActionResult QueryBookSuits() {
-        return RespOk();
+        int page = AsInt(Request.Query[EntityKey.KeyPage]);
+        int pageSize = AsInt(Request.Query[EntityKey.KeyPageSize]);
+        if (!IsValidInt(page) || !IsValidInt(pageSize)) {
+            return RespError(ControllerError.ErrParamErr);
+        }
+
+        var bookSuits = BookSuitOp.QueryEntities(page, pageSize);
+        FillInBookSuits(bookSuits);
+        return RespOkData(EntityKey.RespBookSuits, bookSuits);
     }
 
     [HttpGet("query/like/name")]
     public IActionResult QueryBookSuitsLikeName() {
-        return RespOk();
+        string? name = Request.Query[EntityKey.KeyName];
+        if (IsEmpty(name)) {
+            return RespError(ControllerError.ErrParamErr);
+        }
+
+        var bookSuits = BookSuitOp.QueryEntitiesLikeName(name!);
+        FillInBookSuits(bookSuits);
+        return RespOkData(EntityKey.RespBookSuits, bookSuits);
+    }
+
+    private void FillInBookSuits(List<BookSuit>? bookSuits) {
+        if (bookSuits == null) {
+            return;
+        }
+        foreach (var bookSuit in bookSuits) {
+            foreach (var bookId in bookSuit.BookIds) {
+                var book = BookOp.FindEntityById(bookId);
+                if (book != null) {
+                    bookSuit.Books.Add(book);
+                }
+            }
+        }
     }
 }

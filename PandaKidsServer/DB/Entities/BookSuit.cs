@@ -1,4 +1,6 @@
-﻿namespace PandaKidsServer.DB.Entities;
+﻿using MongoDB.Bson.Serialization.Attributes;
+
+namespace PandaKidsServer.DB.Entities;
 
 /// <summary>
 ///     includes one or more books; a suit of books
@@ -6,7 +8,11 @@
 public class BookSuit : Entity
 {
     public List<string> BookIds = [];
+    
     public string Content = "";
 
     public string Details = "";
+    
+    [BsonIgnore]
+    public List<Book> Books = [];
 }
