@@ -2,53 +2,151 @@
 using Newtonsoft.Json;
 using PandaKidsServer.DB.Entities;
 using PandaKidsServer.DB.Operators;
-
+using static PandaKidsServer.Common.Common;
+using static PandaKidsServer.Common.BasicType;
 namespace PandaKidsServer.Controllers;
 
 [ApiController]
-[Route("book/suit")]
+[Route("pandakids/booksuit")]
 public class BookSuitController : PkBaseController
 {
-    private readonly BookSuitOperator _bookSuitOperator;
-
     public BookSuitController(AppContext ctx) : base(ctx) {
         AppContext = ctx;
-        _bookSuitOperator = AppContext.GetDatabase().GetBookSuitOperator();
-    }
-
-    [HttpPost("create")]
-    public IActionResult CreateSuit(IFormCollection form) {
-        if (!form.TryGetValue(EntityKey.KeyName, out var name)) return RespError(ControllerError.ErrParamErr);
-
-        return Ok();
     }
 
     [HttpPost("insert")]
-    public IActionResult InsertBook(IFormCollection form) {
-        foreach (var key in form.Keys) Console.WriteLine("key: " + key + ", val: " + form[key]);
+    public async Task<IActionResult> InsertBookSuit(IFormCollection form) {
+        // name
+        var name = GetFormValue(form, EntityKey.KeyName);
+        // summary
+        var summary = GetFormValue(form, EntityKey.KeySummary);
+        // details
+        var details = GetFormValue(form, EntityKey.KeyDetails);
 
-        foreach (var file in form.Files) Console.WriteLine("file: " + file.Name + ", " + file.Length);
+        if (IsEmpty(name)) {
+            return RespError(ControllerError.ErrParamErr);
+        }
+        
+        var bookSuit = BookSuitOp.FindEntityByName(name!);
+        
+        // cover
+        BasicPath? coverPath = null;
+        var ret = await CopyImage(form, EntityKey.KeyCoverFile);
+        if (ret.Val != null) {
+            coverPath = ret.Val!;
+            // insert to db
+            var entity = ImageOp.InsertEntityIfNotExistByFile(new Image {
+                Name = coverPath.Name,
+                File = coverPath.RefPath,
+            });
+            if (entity != null) {
+                coverPath.Extra = entity.GetId();
+            }
+        }
+        
+        // add new one
+        if (bookSuit == null) {
+            var newBookSuit = new BookSuit {
+                Name = name!,
+                Summary = summary ?? "",
+                Details = details ?? "",
+                Cover = coverPath != null ? coverPath!.RefPath : "",
+                CoverId = coverPath is { Extra: not null } ? coverPath.Extra! : "",
+            };
 
-        return Ok();
+            if (BookSuitOp.InsertEntity(newBookSuit) == null) {
+                return RespError(ControllerError.ErrInsertToDbFailed);
+            }
+
+            return RespOk();
+        }
+        else {
+            // update exists one
+            bookSuit.Name = name!;
+            if (summary != null) {
+                bookSuit.Summary = summary;
+            }
+            if (details != null) {
+                bookSuit.Details = details;
+            }
+            if (coverPath != null) {
+                bookSuit.Cover = coverPath.RefPath;
+                if (coverPath.Extra != null) {
+                    bookSuit.CoverId = coverPath.Extra!;
+                }
+            }
+            
+            if (!BookSuitOp.ReplaceEntity(bookSuit)) {
+                return RespError(ControllerError.ErrReplaceInDbFailed);
+            }
+            return RespOk();
+        }
     }
 
-    [HttpPost("delete/{id}")]
-    public IActionResult DeleteBook(int id) {
-        if (id > 0)
-            return Ok("");
-        return NotFound();
+    [HttpPost("delete")]
+    public IActionResult DeleteBookSuit() {
+        string? id = Request.Query[EntityKey.KeyId];
+        if (IsEmpty(id)) {
+            return RespError(ControllerError.ErrParamErr);
+        }
+        return BookSuitOp.DeleteEntity(id!) ? RespOk() : RespError(ControllerError.ErrDeleteFailed);
     }
 
-    [HttpGet("query/{id}")]
-    public IActionResult QueryBook(string id) {
-        var json = JsonConvert.SerializeObject(new Dictionary<string, string> {
-            { "name", id }
-        });
-        return Ok(json);
+    [HttpPost("add/book")]
+    public IActionResult AddBook(IFormCollection form) {
+        var entityId = GetFormValue(form, EntityKey.KeyId);
+        var bookId = GetFormValue(form, EntityKey.KeyBookId);
+        if (IsEmpty(entityId) || IsEmpty(bookId)) {
+            return RespError(ControllerError.ErrParamErr);
+        }
+
+        var bookSuit = BookSuitOp.FindEntityById(entityId!);
+        if (bookSuit == null) {
+            return RespError(ControllerError.ErrNoRecordInDb, "BookSuit:" + entityId);
+        }
+        var book = BookOp.FindEntityById(bookId!);
+        if (book == null) {
+            return RespError(ControllerError.ErrNoRecordInDb, "Book:" + bookId);
+        }
+        
+        if (!bookSuit.BookIds.Contains(bookId!)) {
+            bookSuit.BookIds.Add(bookId!);
+        }
+        if (!BookSuitOp.ReplaceEntity(bookSuit)) {
+            return RespError(ControllerError.ErrReplaceInDbFailed);
+        }
+        
+        return RespOk();
+    }
+
+    [HttpPost("delete/book")]
+    public IActionResult DeleteBook(IFormCollection form) {
+        var entityId = GetFormValue(form, EntityKey.KeyId);
+        var bookId = GetFormValue(form, EntityKey.KeyBookId);
+        if (IsEmpty(entityId) || IsEmpty(bookId)) {
+            return RespError(ControllerError.ErrParamErr, "Entity id:" + entityId + ", Book id:" + bookId);
+        }
+
+        var bookSuit = BookSuitOp.FindEntityById(entityId!);
+        if (bookSuit == null) {
+            return RespError(ControllerError.ErrNoRecordInDb, "BookSuit:" + entityId);
+        }
+
+        bookSuit.BookIds.Remove(bookId!);
+        if (!BookSuitOp.ReplaceEntity(bookSuit)) {
+            return RespError(ControllerError.ErrReplaceInDbFailed);
+        }
+
+        return RespOk();
     }
 
     [HttpGet("query")]
-    public IActionResult QueryBooks() {
-        return Ok();
+    public IActionResult QueryBookSuits() {
+        return RespOk();
+    }
+
+    [HttpGet("query/like/name")]
+    public IActionResult QueryBookSuitsLikeName() {
+        return RespOk();
     }
 }

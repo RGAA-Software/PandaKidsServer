@@ -13,6 +13,7 @@ public class PkBaseController : ControllerBase
     protected readonly Database Database;
     protected readonly ResManager.ResManager ResManager;
     protected readonly BookOperator BookOp;
+    protected readonly BookSuitOperator BookSuitOp;
     protected readonly VideoOperator VideoOp;
     protected readonly AudioOperator AudioOp;
     protected readonly ImageOperator ImageOp;
@@ -27,6 +28,7 @@ public class PkBaseController : ControllerBase
         AudioOp = Database.GetAudioOperator();
         ImageOp = Database.GetImageOperator();
         AudioSuitOp = Database.GetAudioSuitOperator();
+        BookSuitOp = Database.GetBookSuitOperator();
     }
 
     private IActionResult ResponseMessage(int code, string? extra, Dictionary<string, object> data) {

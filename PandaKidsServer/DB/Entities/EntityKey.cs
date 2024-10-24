@@ -32,6 +32,8 @@ public class EntityKey
     public const string KeyAudioId = "AudioId";
 
     public const string KeyVideoId = "VideoId";
+
+    public const string KeyBookId = "BookId";
     
     // response
     public const string RespCount = "Count";
