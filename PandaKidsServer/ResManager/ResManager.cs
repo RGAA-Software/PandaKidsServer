@@ -28,7 +28,7 @@ public class ResManager
                 if (!Directory.Exists(targetDir)) Directory.CreateDirectory(targetDir);
             }
             catch (Exception e) {
-                Log.Error("Create folder failed: " + dir);
+                Log.Error("Create folder failed: " + dir + "," + e.Message);
             }
         }
     }
@@ -73,6 +73,7 @@ public class ResManager
             return File.Exists(filePath) ? filePath : null;
         }
         catch (Exception e) {
+            Log.Error("Copy to path failed: " + path + ", target file: " + file.FileName + ", e: " + e.Message);
             return null;
         }
     }

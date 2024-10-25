@@ -134,7 +134,7 @@ public class BookController : PkBaseController
     }
 
     [HttpGet("query")]
-    public async Task<IActionResult> QueryBooks() {
+    public IActionResult QueryBooks() {
         int page = AsInt(Request.Query[EntityKey.KeyPage]);
         int pageSize = AsInt(Request.Query[EntityKey.KeyPageSize]);
         if (!IsValidInt(page) || !IsValidInt(pageSize)) {
@@ -148,19 +148,21 @@ public class BookController : PkBaseController
     }
 
     [HttpGet("query/like/name")]
-    public async Task<IActionResult> QueryBooksLikeName() {
+    public IActionResult QueryBooksLikeName() {
         string? name = Request.Query[EntityKey.KeyName];
-        if (IsEmpty(name)) {
+        int page = AsInt(Request.Query[EntityKey.KeyPage]);
+        int pageSize = AsInt(Request.Query[EntityKey.KeyPageSize]);
+        if (!IsValidInt(page) || !IsValidInt(pageSize) || IsEmpty(name)) {
             return RespError(ControllerError.ErrParamErr);
         }
 
-        var books = BookOp.QueryEntitiesLikeName(name!);
+        var books = BookOp.QueryEntitiesLikeName(name!, page, pageSize);
         FillInBooks(books);
         return RespOkData(EntityKey.RespBooks, books);
     }
 
     [HttpGet("delete")]
-    public async Task<IActionResult> DeleteBook() {
+    public IActionResult DeleteBook() {
         string? id = Request.Query[EntityKey.KeyId];
         if (IsEmpty(id)) {
             return RespError(ControllerError.ErrParamErr);
@@ -169,7 +171,7 @@ public class BookController : PkBaseController
     }
     
     [HttpGet("count")]
-    public async Task<IActionResult> CountBook() {
+    public IActionResult CountBook() {
         return RespOkValue(BookOp.CountTotalEntities());
     }
     
@@ -181,7 +183,11 @@ public class BookController : PkBaseController
         var summary = GetFormValue(form, EntityKey.KeySummary);
         var content = GetFormValue(form, EntityKey.KeyContent);
         var details = GetFormValue(form, EntityKey.KeyDetails);
-        var book = BookOp.FindEntityById(id);
+        if (IsEmpty(id)) {
+            return RespError(ControllerError.ErrParamErr);
+        }
+
+        var book = BookOp.FindEntityById(id!);
         if (book == null) {
             return RespError(ControllerError.ErrNoRecordInDb);
         }
@@ -253,7 +259,7 @@ public class BookController : PkBaseController
     }
 
     [HttpPost("delete/audio")]
-    public async Task<IActionResult> DeleteAudio(IFormCollection form) {
+    public IActionResult DeleteAudio(IFormCollection form) {
         var entityId = GetFormValue(form, EntityKey.KeyId);
         var audioId = GetFormValue(form, EntityKey.KeyAudioId);
         if (IsEmpty(entityId) || IsEmpty(audioId)) {
@@ -273,7 +279,7 @@ public class BookController : PkBaseController
     }
     
     [HttpPost("delete/video")]
-    public async Task<IActionResult> DeleteVideo(IFormCollection form) {
+    public IActionResult DeleteVideo(IFormCollection form) {
         var entityId = GetFormValue(form, EntityKey.KeyId);
         var videoId = GetFormValue(form, EntityKey.KeyVideoId);
         if (IsEmpty(entityId) || IsEmpty(videoId)) {
@@ -400,6 +406,9 @@ public class BookController : PkBaseController
 
         foreach (var book in books) {
             foreach (var bookAudioId in book.AudioIds) {
+                if (!IsValidId(bookAudioId)) {
+                    continue;
+                }
                 var audio = AudioOp.FindEntityById(bookAudioId);
                 if (audio != null) {
                     book.Audios.Add(audio);
@@ -407,6 +416,9 @@ public class BookController : PkBaseController
             }
 
             foreach (var bookVideoId in book.VideoIds) {
+                if (!IsValidId(bookVideoId)) {
+                    continue;
+                }
                 var video = VideoOp.FindEntityById(bookVideoId);
                 if (video != null) {
                     book.Videos.Add(video);

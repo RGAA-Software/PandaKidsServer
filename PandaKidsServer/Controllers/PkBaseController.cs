@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using PandaKidsServer.DB;
 using PandaKidsServer.DB.Entities;
 using PandaKidsServer.DB.Operators;
 using static PandaKidsServer.Common.BasicType;
@@ -10,25 +9,26 @@ namespace PandaKidsServer.Controllers;
 public class PkBaseController : ControllerBase
 {
     protected AppContext AppContext;
-    protected readonly Database Database;
     protected readonly ResManager.ResManager ResManager;
     protected readonly BookOperator BookOp;
     protected readonly BookSuitOperator BookSuitOp;
     protected readonly VideoOperator VideoOp;
+    protected readonly VideoSuitOperator VideoSuitOp;
     protected readonly AudioOperator AudioOp;
-    protected readonly ImageOperator ImageOp;
     protected readonly AudioSuitOperator AudioSuitOp;
+    protected readonly ImageOperator ImageOp;
     
     public PkBaseController(AppContext ctx) {
         AppContext = ctx;
         ResManager = AppContext.GetResManager();
-        Database = AppContext.GetDatabase();
-        BookOp = Database.GetBookOperator();
-        VideoOp = Database.GetVideoOperator();
-        AudioOp = Database.GetAudioOperator();
-        ImageOp = Database.GetImageOperator();
-        AudioSuitOp = Database.GetAudioSuitOperator();
-        BookSuitOp = Database.GetBookSuitOperator();
+        var db = AppContext.GetDatabase();
+        BookOp = db.GetBookOperator();
+        VideoOp = db.GetVideoOperator();
+        AudioOp = db.GetAudioOperator();
+        ImageOp = db.GetImageOperator();
+        AudioSuitOp = db.GetAudioSuitOperator();
+        BookSuitOp = db.GetBookSuitOperator();
+        VideoSuitOp = db.GetVideoSuitOperator();
     }
 
     private IActionResult ResponseMessage(int code, string? extra, Dictionary<string, object> data) {
@@ -69,7 +69,7 @@ public class PkBaseController : ControllerBase
         return ResponseMessage(code, extra, data);
     }
 
-    protected IActionResult RespErrValue(int code, string? extra, object? value) {
+    protected IActionResult RespErrValue(int code, string? extra, object value) {
         return RespErrorData(code, extra, new Dictionary<string, object> {
             { "Value", value }
         });
@@ -165,13 +165,17 @@ public class PkBaseController : ControllerBase
         return form.TryGetValue(key, out var value) ? value.ToString() : null;
     }
 
-    protected Dictionary<string, object> MakeRespData(string name, object data) {
+    private Dictionary<string, object> MakeRespData(string name, object data) {
         return new Dictionary<string, object> {
             { name, data }
         };
     }
 
-    public class RespMessage
+    protected bool IsValidId(string? id) {
+        return id is { Length: 24 };
+    }
+
+    protected class RespMessage
     {
         public int Code;
         public Dictionary<string, object> Data = new();

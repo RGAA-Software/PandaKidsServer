@@ -48,7 +48,7 @@ public static class Common
         try {
             return int.Parse(value!);
         }
-        catch (Exception e) {
+        catch (Exception) {
             return int.MinValue;
         }
     }

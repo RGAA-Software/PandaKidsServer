@@ -1,4 +1,6 @@
-﻿namespace PandaKidsServer.DB.Entities;
+﻿using MongoDB.Bson.Serialization.Attributes;
+
+namespace PandaKidsServer.DB.Entities;
 
 /// <summary>
 ///     a suit of video
@@ -10,4 +12,7 @@ public class VideoSuit : Entity
     public string Details = "";
 
     public List<string> VideoIds = [];
+    
+    [BsonIgnore]
+    public List<Video> Videos = [];
 }

@@ -12,7 +12,6 @@ namespace PandaKidsServer.Controllers;
 [Route("pandakids/audiosuit")]
 public class AudioSuitController(AppContext ctx) : PkBaseController(ctx)
 {
-    private readonly AppContext _appContext = ctx;
 
     [HttpPost("insert")]
     public async Task<IActionResult> InsertAudioSuit(IFormCollection form) {
@@ -143,7 +142,7 @@ public class AudioSuitController(AppContext ctx) : PkBaseController(ctx)
     }
 
     [HttpPost("delete/audio")]
-    public async Task<IActionResult> DeleteAudio(IFormCollection form) {
+    public IActionResult DeleteAudio(IFormCollection form) {
         var entityId = GetFormValue(form, EntityKey.KeyId);
         var audioId = GetFormValue(form, EntityKey.KeyAudioId);
         if (IsEmpty(entityId) || IsEmpty(audioId)) {
@@ -179,11 +178,13 @@ public class AudioSuitController(AppContext ctx) : PkBaseController(ctx)
     [HttpGet("query/like/name")]
     public IActionResult QueryAudioSuitsLikeName() {
         string? name = Request.Query[EntityKey.KeyName];
-        if (IsEmpty(name)) {
+        int page = AsInt(Request.Query[EntityKey.KeyPage]);
+        int pageSize = AsInt(Request.Query[EntityKey.KeyPageSize]);
+        if (!IsValidInt(page) || !IsValidInt(pageSize) || IsEmpty(name)) {
             return RespError(ControllerError.ErrParamErr);
         }
-
-        var audioSuits = AudioSuitOp.QueryEntitiesLikeName(name!);
+        
+        var audioSuits = AudioSuitOp.QueryEntitiesLikeName(name!, page, pageSize);
         FillInAudioSuits(audioSuits);
         return RespOkData(EntityKey.RespAudioSuits, audioSuits);
     }
@@ -199,6 +200,9 @@ public class AudioSuitController(AppContext ctx) : PkBaseController(ctx)
         }
         foreach (var audioSuit in audioSuits) {
             foreach (var audioId in audioSuit.AudioIds) {
+                if (!IsValidId(audioId)) {
+                    continue;
+                }
                 var audio = AudioOp.FindEntityById(audioId);
                 if (audio != null) {
                     audioSuit.Audios.Add(audio);

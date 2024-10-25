@@ -41,6 +41,7 @@ public abstract class CollectionOperator<T> where T : Entity
             return true;
         }
         catch (Exception e) {
+            Log.Error("Delete failed: " + id + ", e: " + e.Message);
             return false;
         }
     }
@@ -67,10 +68,12 @@ public abstract class CollectionOperator<T> where T : Entity
         return docs;
     }
 
-    public List<T> QueryEntitiesLikeName(string name) {
+    public List<T> QueryEntitiesLikeName(string name, int page, int pageSize) {
         var regexPattern = new BsonRegularExpression(new Regex(name, RegexOptions.IgnoreCase));
         var filter = Builders<T>.Filter.Regex(x => x.Name, regexPattern);
-        var result = Collection.Find(filter).ToList();
+        var result = Collection.Find(filter)
+            .Skip((page - 1) * pageSize)
+            .Limit(pageSize).ToList();
         return result;
     }
 
