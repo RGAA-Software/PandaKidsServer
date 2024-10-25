@@ -193,7 +193,12 @@ public class AudioSuitController(AppContext ctx) : PkBaseController(ctx)
     public IActionResult AddCategories() {
         return Ok();
     }
-    
+
+    [HttpGet("query/category")]
+    public IActionResult QueryByCategory() {
+        return RespOk();
+    }
+
     private void FillInAudioSuits(List<AudioSuit>? audioSuits) {
         if (audioSuits == null) {
             return;

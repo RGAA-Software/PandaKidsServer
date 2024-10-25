@@ -189,6 +189,16 @@ public class VideoSuitController(AppContext ctx) : PkBaseController(ctx)
         return RespOkData(EntityKey.RespVideoSuits, videoSuits);
     }
     
+    [HttpPost("add/categories")]
+    public IActionResult AddCategories(IFormCollection form) {
+        return RespOk();
+    }
+    
+    [HttpGet("query/category")]
+    public IActionResult QueryByCategory() {
+        return RespOk();
+    }
+    
     private void FillInVideoSuit(List<VideoSuit>? videoSuits) {
         if (videoSuits == null) {
             return;

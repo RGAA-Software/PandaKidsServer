@@ -167,6 +167,16 @@ public class BookSuitController : PkBaseController
         return RespOkData(EntityKey.RespBookSuits, bookSuits);
     }
 
+    [HttpPost("add/categories")]
+    public IActionResult AddCategories(IFormCollection form) {
+        return RespOk();
+    }
+    
+    [HttpGet("query/category")]
+    public IActionResult QueryByCategory() {
+        return RespOk();
+    }
+    
     private void FillInBookSuits(List<BookSuit>? bookSuits) {
         if (bookSuits == null) {
             return;

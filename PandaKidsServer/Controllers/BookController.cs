@@ -399,6 +399,16 @@ public class BookController : PkBaseController
         return RespOkData(EntityKey.RespBook, book);
     }
     
+    [HttpPost("add/categories")]
+    public IActionResult AddCategories(IFormCollection form) {
+        return RespOk();
+    }
+    
+    [HttpGet("query/category")]
+    public IActionResult QueryByCategory() {
+        return RespOk();
+    }
+    
     private void FillInBooks(List<Book>? books) {
         if (books == null) {
             return;
