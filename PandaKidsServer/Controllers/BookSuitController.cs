@@ -11,7 +11,7 @@ namespace PandaKidsServer.Controllers;
 public class BookSuitController : PkBaseController
 {
     public BookSuitController(AppContext ctx) : base(ctx) {
-        AppContext = ctx;
+        AppCtx = ctx;
     }
 
     [HttpPost("insert")]

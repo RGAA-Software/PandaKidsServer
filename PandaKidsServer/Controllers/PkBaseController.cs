@@ -8,7 +8,7 @@ namespace PandaKidsServer.Controllers;
 
 public class PkBaseController : ControllerBase
 {
-    protected AppContext AppContext;
+    protected AppContext AppCtx;
     protected readonly ResManager.ResManager ResManager;
     protected readonly BookOperator BookOp;
     protected readonly BookSuitOperator BookSuitOp;
@@ -19,9 +19,9 @@ public class PkBaseController : ControllerBase
     protected readonly ImageOperator ImageOp;
     
     public PkBaseController(AppContext ctx) {
-        AppContext = ctx;
-        ResManager = AppContext.GetResManager();
-        var db = AppContext.GetDatabase();
+        AppCtx = ctx;
+        ResManager = AppCtx.GetResManager();
+        var db = AppCtx.GetDatabase();
         BookOp = db.GetBookOperator();
         VideoOp = db.GetVideoOperator();
         AudioOp = db.GetAudioOperator();

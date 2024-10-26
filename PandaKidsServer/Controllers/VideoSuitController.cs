@@ -91,52 +91,29 @@ public class VideoSuitController(AppContext ctx) : PkBaseController(ctx)
     }
     
     [HttpPost("add/video")]
-    public async Task<IActionResult> AddVideo(IFormCollection form) {
-        var videoFiles = FilterVideoFiles(form);
-        if (videoFiles.Count <= 0) {
-            return RespError(ControllerError.ErrNoFile);
-        }
-        
-        var id = GetFormValue(form, EntityKey.KeyId);
-        if (IsEmpty(id)) {
+    public IActionResult AddVideo(IFormCollection form) {
+        var entityId = GetFormValue(form, EntityKey.KeyId);
+        var videoId = GetFormValue(form, EntityKey.KeyVideoId);
+        if (IsEmpty(entityId) || IsEmpty(videoId)) {
             return RespError(ControllerError.ErrParamErr);
         }
-        var videoSuit = VideoSuitOp.FindEntityById(id!);
-        if (videoSuit == null) {
-            return RespError(ControllerError.ErrNoRecordInDb);
-        }
 
-        var videoPaths = new List<BasicPath>();
-        foreach (var videoFile in videoFiles) {
-            var ret = await CopyVideo(videoFile);
-            if (ret.Key == null && ret.Val != null) {
-                var audioPath = ret.Val!;
-                videoPaths.Add(audioPath);
-                // insert into db
-                var entity = AudioOp.InsertEntityIfNotExistByFile(new Audio {
-                    Name = audioPath.Name,
-                    File = audioPath.RefPath,
-                });
-                if (entity == null) {
-                    Log.Error("Insert " + audioPath.Name + " to db failed.");
-                    continue;
-                }
-                audioPath.Extra = entity.GetId();
-            }
+        var videoSuit = VideoSuitOp.FindEntityById(entityId!);
+        if (videoSuit == null) {
+            return RespError(ControllerError.ErrNoRecordInDb, "VideoSuit:" + entityId);
+        }
+        var book = VideoOp.FindEntityById(videoId!);
+        if (book == null) {
+            return RespError(ControllerError.ErrNoRecordInDb, "Video:" + videoId);
         }
         
-        foreach (var videoPath in videoPaths) {
-            if (videoPath.Extra != null) {
-                var audioId = videoPath.Extra!;
-                if (!videoSuit.VideoIds.Contains(audioId)) {
-                    videoSuit.VideoIds.Add(audioId);
-                }
-            }
+        if (!videoSuit.VideoIds.Contains(videoId!)) {
+            videoSuit.VideoIds.Add(videoId!);
         }
-
         if (!VideoSuitOp.ReplaceEntity(videoSuit)) {
             return RespError(ControllerError.ErrReplaceInDbFailed);
         }
+        
         return RespOk();
     }
 

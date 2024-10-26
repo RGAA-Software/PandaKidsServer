@@ -12,7 +12,7 @@ namespace PandaKidsServer.Controllers;
 public class BookController : PkBaseController
 {
     public BookController(AppContext ctx) : base(ctx) {
-        AppContext = ctx;
+        AppCtx = ctx;
     }
 
     [HttpPost("insert")]
@@ -234,6 +234,9 @@ public class BookController : PkBaseController
                     coverPath.Extra = entity.GetId();
                 }
                 else {
+                    var oldImagePath = Path.Combine(Directory.GetCurrentDirectory(), image.Cover);
+                    DeleteFile(oldImagePath);
+                    
                     image.Name = coverPath.Name;
                     image.File = coverPath.RefPath;
                     ImageOp.ReplaceEntity(image);
