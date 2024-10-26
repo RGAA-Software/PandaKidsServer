@@ -1,5 +1,6 @@
 ﻿using PandaKidsServer.DB;
 using PandaKidsServer.OnlineUser;
+using PandaKidsServer.ResManager;
 using Serilog;
 
 namespace PandaKidsServer;
@@ -9,11 +10,13 @@ public class AppContext
     private readonly Database _database;
     private readonly OnlineUserManager _onlineUserManager;
     private readonly ResManager.ResManager _resManager;
+    private readonly PresetResManager _presetResManager;
 
     public AppContext() {
         _onlineUserManager = new OnlineUserManager(this);
         _database = new Database(this);
         _resManager = new ResManager.ResManager(this);
+        _presetResManager = new PresetResManager(this);
     }
 
     public void Init() {
@@ -35,5 +38,9 @@ public class AppContext
 
     public ResManager.ResManager GetResManager() {
         return _resManager;
+    }
+
+    public PresetResManager GetPresetResManager() {
+        return _presetResManager;
     }
 }

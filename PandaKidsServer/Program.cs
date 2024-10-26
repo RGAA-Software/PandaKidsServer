@@ -78,7 +78,5 @@ app.Use(async (context, next) => {
     }
 });
 
-
-
 Log.Information("----> RUN <----");
 app.Run();
