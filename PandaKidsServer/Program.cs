@@ -3,6 +3,7 @@ using Microsoft.Extensions.FileProviders;
 using PandaKidsServer.Common;
 using PandaKidsServer.Handlers;
 using PandaKidsServer.OnlineUser;
+using PandaKidsServer.ResManager;
 using Serilog;
 using AppContext = PandaKidsServer.AppContext;
 
@@ -27,6 +28,7 @@ builder.Services.AddSwaggerGen();
 builder.WebHost.ConfigureKestrel(options =>
 {
     options.Limits.MaxRequestBodySize = 1 * 1024 * 1024 * 1024;
+    options.AllowSynchronousIO = true;
 });
 
 var app = builder.Build();
@@ -54,6 +56,9 @@ app.UseStaticFiles(new StaticFileOptions {
 //     FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Resources")),
 //     RequestPath = "/Resources"
 // });
+
+OuterImgMiddleware.RootPath = appContext.GetResManager().GetBasePath();
+app.UseOutImg();
 
 app.Use(async (context, next) => {
     if (context.Request.Path == "/ws") {

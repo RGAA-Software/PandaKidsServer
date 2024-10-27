@@ -33,6 +33,10 @@ public class ResManager
         }
     }
 
+    public string GetBasePath() {
+        return _basePath;
+    }
+
     public string GetBookAbsPath() {
         return Path.Combine(_basePath, Level1DirBooks);
     }
