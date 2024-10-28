@@ -69,4 +69,34 @@ public static class Common
             return false;
         }
     }
+    
+    public static void TraverseDirectory(string currentDirectory)  {
+        string[] files = Directory.GetFiles(currentDirectory);
+        foreach (string file in files)  {
+            Console.WriteLine("File: " + file);
+        }
+        
+        string[] subDirectories = Directory.GetDirectories(currentDirectory);
+        foreach (string subDir in subDirectories)  {
+            Console.WriteLine("Directory: " + subDir);
+            TraverseDirectory(subDir);
+        }
+    }
+
+    public delegate void OnDirectoryCallback(string path);
+    public delegate void OnFileCallback(string path);
+    
+    public static void Traverse1LevelDirectories(string path, OnDirectoryCallback cbk) {
+        var subDirectories = Directory.GetDirectories(path);
+        foreach (var subDir in subDirectories)  {
+            cbk.Invoke(subDir);
+        }
+    }
+
+    public static void Traverse1LevelFiles(string path, OnFileCallback cbk) {
+        var files = Directory.GetFiles(path);
+        foreach (var file in files) {
+            cbk.Invoke(file);
+        }
+    }
 }
