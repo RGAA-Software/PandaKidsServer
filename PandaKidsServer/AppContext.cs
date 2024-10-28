@@ -1,4 +1,6 @@
-﻿using PandaKidsServer.DB;
+﻿using MongoDB.Driver;
+using Nett;
+using PandaKidsServer.DB;
 using PandaKidsServer.OnlineUser;
 using PandaKidsServer.ResManager;
 using Serilog;
@@ -11,8 +13,15 @@ public class AppContext
     private readonly OnlineUserManager _onlineUserManager;
     private readonly ResManager.ResManager _resManager;
     private readonly PresetResManager _presetResManager;
-
+    private readonly Settings _settings;
+    
     public AppContext() {
+        var settingsPath = Directory.GetCurrentDirectory() + "/settings.toml";
+        _settings = Toml.ReadFile(settingsPath).Get<Settings>(); 
+        _settings.CheckParams();
+        
+        Log.Information("settings: " + _settings.Dump());
+        
         _onlineUserManager = new OnlineUserManager(this);
         _database = new Database(this);
         _resManager = new ResManager.ResManager(this);
@@ -28,6 +37,10 @@ public class AppContext
         _resManager.Init();
     }
 
+    public Settings GetSettings() {
+        return _settings;
+    }
+    
     public OnlineUserManager GetOnlineUserManager() {
         return _onlineUserManager;
     }

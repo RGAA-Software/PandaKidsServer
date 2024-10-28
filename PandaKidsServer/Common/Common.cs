@@ -50,7 +50,7 @@ public static class Common
             }
             return true;
         }
-        catch (Exception ex) {
+        catch (Exception) {
             return false;
         }
     }

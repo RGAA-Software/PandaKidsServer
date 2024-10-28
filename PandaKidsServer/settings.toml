@@ -1,0 +1,5 @@
+﻿# server's listening port
+ListenPort = 9988
+
+# resources folder
+ResPath = ""
