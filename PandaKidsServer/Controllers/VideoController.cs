@@ -113,7 +113,7 @@ public class VideoController(AppContext appContext) : PkBaseController(appContex
                 coverPath.Extra = entity.GetId();
             }
             else {
-                var oldImagePath = Path.Combine(Directory.GetCurrentDirectory(), video.Cover);
+                var oldImagePath = Path.Combine(appContext.GetSettings().ResPath, video.Cover);
                 DeleteFile(oldImagePath);
                 
                 image.Name = coverPath.Name;
@@ -132,7 +132,7 @@ public class VideoController(AppContext appContext) : PkBaseController(appContex
         if (retCopyVideo.Key == null && retCopyVideo.Val != null) {
             var videoPath = retCopyVideo.Val!;
             // delete old one
-            var oldFilePath = Path.Combine(Directory.GetCurrentDirectory(), video.File);
+            var oldFilePath = Path.Combine(AppCtx.GetSettings().ResPath, video.File);
             DeleteFile(oldFilePath);
             video.File = videoPath.RefPath;
         }

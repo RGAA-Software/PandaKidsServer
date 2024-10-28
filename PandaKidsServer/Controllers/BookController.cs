@@ -234,7 +234,7 @@ public class BookController : PkBaseController
                     coverPath.Extra = entity.GetId();
                 }
                 else {
-                    var oldImagePath = Path.Combine(Directory.GetCurrentDirectory(), image.Cover);
+                    var oldImagePath = Path.Combine(AppCtx.GetSettings().ResPath, image.Cover);
                     DeleteFile(oldImagePath);
                     
                     image.Name = coverPath.Name;

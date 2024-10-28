@@ -112,7 +112,7 @@ public class AudioController(AppContext appContext) : PkBaseController(appContex
                 coverPath.Extra = entity.GetId();
             }
             else {
-                var oldImagePath = Path.Combine(Directory.GetCurrentDirectory(), audio.Cover);
+                var oldImagePath = Path.Combine(appContext.GetSettings().ResPath, audio.Cover);
                 DeleteFile(oldImagePath);
                 
                 image.Name = coverPath.Name;
@@ -131,7 +131,7 @@ public class AudioController(AppContext appContext) : PkBaseController(appContex
         if (retCopyAudio.Key == null && retCopyAudio.Val != null) {
             var audioPath = retCopyAudio.Val!;
             // delete old one
-            var oldFilePath = Path.Combine(Directory.GetCurrentDirectory(), audio.File);
+            var oldFilePath = Path.Combine(appContext.GetSettings().ResPath, audio.File);
             DeleteFile(oldFilePath);
             audio.File = audioPath.RefPath;
         }

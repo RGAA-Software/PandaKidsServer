@@ -9,32 +9,29 @@ namespace PandaKidsServer;
 
 public class AppContext
 {
-    private readonly Database _database;
-    private readonly OnlineUserManager _onlineUserManager;
-    private readonly ResManager.ResManager _resManager;
-    private readonly PresetResManager _presetResManager;
+    private Database _database;
+    private OnlineUserManager _onlineUserManager;
+    private ResManager.ResManager _resManager;
+    private PresetResManager _presetResManager;
     private readonly Settings _settings;
     
     public AppContext() {
         var settingsPath = Directory.GetCurrentDirectory() + "/settings.toml";
         _settings = Toml.ReadFile(settingsPath).Get<Settings>(); 
         _settings.CheckParams();
-        
         Log.Information("settings: " + _settings.Dump());
-        
-        _onlineUserManager = new OnlineUserManager(this);
-        _database = new Database(this);
-        _resManager = new ResManager.ResManager(this);
-        _presetResManager = new PresetResManager(this);
     }
 
     public void Init() {
+        _database = new Database(this);
         if (!_database.Connect("mongodb://localhost:27017")) {
             Log.Error("Connect to mongodb failed!");
             return;
         }
-
+        _onlineUserManager = new OnlineUserManager(this);
+        _resManager = new ResManager.ResManager(this);
         _resManager.Init();
+        _presetResManager = new PresetResManager(this);
     }
 
     public Settings GetSettings() {

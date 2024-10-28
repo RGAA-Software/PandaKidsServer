@@ -2,4 +2,4 @@
 ListenPort = 9988
 
 # resources folder
-ResPath = ""
+ResPath = "D:/PandaKidsResources"

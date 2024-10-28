@@ -44,10 +44,9 @@ app.UseAuthorization();
 app.MapControllers();
 app.UseWebSockets();
 
-Console.WriteLine("Directory.GetCurrentDirectory(): " + Directory.GetCurrentDirectory());
 app.UseStaticFiles();
 app.UseStaticFiles(new StaticFileOptions {
-    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Resources")),
+    FileProvider = new PhysicalFileProvider(Path.Combine(appContext.GetSettings().ResPath, "Resources")),
     RequestPath = "/Resources"
 });
 

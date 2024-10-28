@@ -14,7 +14,7 @@ public class Settings
         }
         if (!Directory.Exists(ResPath)) {
             Log.Warning("Res path not exists, clear it!");
-            ResPath = "";
+            ResPath = Directory.GetCurrentDirectory();
         }
     }
 

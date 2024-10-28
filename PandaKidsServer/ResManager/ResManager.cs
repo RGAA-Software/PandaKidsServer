@@ -19,7 +19,7 @@ public class ResManager
 
     public void Init() {
         // make dirs
-        _basePath = Path.Combine(Directory.GetCurrentDirectory(), "Resources");
+        _basePath = Path.Combine(_appContext.GetSettings().ResPath, "Resources");
         var dirs = new List<string> {
             Level1DirBooks, Level1DirVideos, Level1DirAudios, Level1DirImages, Level1PresetPath
         };
