@@ -8,6 +8,7 @@ public class ResManager
     private const string Level1DirVideos = "Videos";
     private const string Level1DirAudios = "Audios";
     private const string Level1DirImages = "Images";
+    private const string Level1PresetPath = "Preset";
     private readonly AppContext _appContext;
 
     private string _basePath = "";
@@ -20,7 +21,7 @@ public class ResManager
         // make dirs
         _basePath = Path.Combine(Directory.GetCurrentDirectory(), "Resources");
         var dirs = new List<string> {
-            Level1DirBooks, Level1DirVideos, Level1DirAudios, Level1DirImages
+            Level1DirBooks, Level1DirVideos, Level1DirAudios, Level1DirImages, Level1PresetPath
         };
         foreach (var dir in dirs) {
             var targetDir = _basePath + "/" + dir;
@@ -35,6 +36,10 @@ public class ResManager
 
     public string GetBasePath() {
         return _basePath;
+    }
+
+    public string GetPresetPath() {
+        return Path.Combine(_basePath, Level1PresetPath);
     }
 
     public string GetBookAbsPath() {

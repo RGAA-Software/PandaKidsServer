@@ -6,25 +6,25 @@ using static PandaKidsServer.Common.BasicType;
 namespace PandaKidsServer.Controllers;
 
 [ApiController]
-[Route("pandakids/video")]
-public class VideoController(AppContext appContext) : PkBaseController(appContext)  {
+[Route("pandakids/audio")]
+public class AudioController(AppContext appContext) : PkBaseController(appContext)  {
 
     [HttpPost("insert")]
-    public async Task<IActionResult> InsertVideo(IFormCollection form) {
+    public async Task<IActionResult> InsertAudio(IFormCollection form) {
         var inFile = form.Files.GetFile(EntityKey.KeyFile);
         if (inFile != null) {
-            var inFilePath = Path.Combine(ResManager.GetVideoAbsPath(), inFile.FileName);
+            var inFilePath = Path.Combine(ResManager.GetAudioAbsPath(), inFile.FileName);
             if (System.IO.File.Exists(inFilePath)) {
                 //return RespError(ControllerError.ErrFileAlreadyExist);
             }
         }
 
-        // * video
-        BasicType.BasicPath videoPath;
+        // * audio
+        BasicPath audioPath;
         {
-            var ret = await CopyVideo(form, EntityKey.KeyFile);
+            var ret = await CopyAudio(form, EntityKey.KeyFile);
             if (ret.Key != null) return ret.Key;
-            videoPath = ret.Val!;
+            audioPath = ret.Val!;
         }
         
         // * cover
@@ -41,7 +41,6 @@ public class VideoController(AppContext appContext) : PkBaseController(appContex
                 if (entity == null) {
                     return RespError(ControllerError.ErrFileAlreadyExist);
                 }
-
                 coverPath.Extra = entity.GetId();
             }
         }
@@ -49,35 +48,35 @@ public class VideoController(AppContext appContext) : PkBaseController(appContex
         var name = GetFormValue(form, EntityKey.KeyName);
         var summary = GetFormValue(form, EntityKey.KeySummary);
 
-        var video = new Video {
+        var audio = new Audio {
             Cover = coverPath != null ? coverPath.RefPath : "",
-            CoverId = coverPath!= null ? coverPath.Extra! : "",
-            Name = name ?? videoPath.Name,
+            CoverId = coverPath != null ? coverPath.Extra! : "",
+            Name = name ?? audioPath.Name,
             Summary = summary ?? "",
-            File = videoPath.RefPath,
+            File = audioPath.RefPath,
         };
         
-        var existVideo = VideoOp.FindEntityByFilePath(video.File);
-        if (existVideo != null) {
+        var existAudio = AudioOp.FindEntityByFilePath(audio.File);
+        if (existAudio != null) {
             return RespError(ControllerError.ErrRecordAlreadyExist);
         }
-        if (VideoOp.InsertEntity(video) == null) {
-            return RespError(ControllerError.ErrInsertVideoFailed);
+        if (AudioOp.InsertEntity(audio) == null) {
+            return RespError(ControllerError.ErrInsertAudioFailed);
         }
-        return RespOkData(EntityKey.RespVideo, video);
+        return RespOkData(EntityKey.RespAudio, audio);
     }
 
     [HttpPost("delete")]
-    public IActionResult DeleteVideo(IFormCollection form) {
+    public IActionResult DeleteAudio(IFormCollection form) {
         var id = GetFormValue(form, EntityKey.KeyId);
         if (IsEmpty(id)) {
             return RespError(ControllerError.ErrParamErr);
         }
-        return VideoOp.DeleteEntity(id!) ? RespOk() : RespError(ControllerError.ErrDeleteFailed);
+        return AudioOp.DeleteEntity(id!) ? RespOk() : RespError(ControllerError.ErrDeleteFailed);
     }
 
     [HttpPost("update")]
-    public async Task<IActionResult> UpdateVideo(IFormCollection form) {
+    public async Task<IActionResult> UpdateAudio(IFormCollection form) {
         var id = GetFormValue(form, EntityKey.KeyId);
         var name = GetFormValue(form, EntityKey.KeyName);
         var summary = GetFormValue(form, EntityKey.KeySummary);
@@ -85,22 +84,22 @@ public class VideoController(AppContext appContext) : PkBaseController(appContex
             return RespError(ControllerError.ErrParamErr);
         }
         
-        var video = VideoOp.FindEntityById(id!);
-        if (video == null) {
+        var audio = AudioOp.FindEntityById(id!);
+        if (audio == null) {
             return RespError(ControllerError.ErrNoRecordInDb);
         }
         if (name != null) {
-            video.Name = name;
+            audio.Name = name;
         }
         if (summary != null) {
-            video.Summary = summary;
+            audio.Summary = summary;
         }
         // * cover
         BasicPath? coverPath = null;
         var retCopyImage = await CopyImage(form, EntityKey.KeyCoverFile);
         if (retCopyImage.Key == null && retCopyImage.Val != null) {
             coverPath = retCopyImage.Val!;
-            var image = ImageOp.FindEntityById(video.CoverId);
+            var image = ImageOp.FindEntityById(audio.CoverId);
             if (image == null) {
                 // insert to db
                 var entity = ImageOp.InsertEntityIfNotExistByFile(new Image {
@@ -113,31 +112,31 @@ public class VideoController(AppContext appContext) : PkBaseController(appContex
                 coverPath.Extra = entity.GetId();
             }
             else {
-                var oldImagePath = Path.Combine(Directory.GetCurrentDirectory(), video.Cover);
+                var oldImagePath = Path.Combine(Directory.GetCurrentDirectory(), audio.Cover);
                 DeleteFile(oldImagePath);
                 
                 image.Name = coverPath.Name;
                 image.File = coverPath.RefPath;
                 ImageOp.ReplaceEntity(image);
-                coverPath.Extra = video.CoverId;
+                coverPath.Extra = audio.CoverId;
             }
         }
         if (coverPath != null) {
-            video.Cover = coverPath.RefPath;
-            video.CoverId = coverPath.Extra!;
+            audio.Cover = coverPath.RefPath;
+            audio.CoverId = coverPath.Extra!;
         }
 
-        // * video
-        var retCopyVideo = await CopyVideo(form, EntityKey.KeyFile);
-        if (retCopyVideo.Key == null && retCopyVideo.Val != null) {
-            var videoPath = retCopyVideo.Val!;
+        // * audio
+        var retCopyAudio = await CopyAudio(form, EntityKey.KeyFile);
+        if (retCopyAudio.Key == null && retCopyAudio.Val != null) {
+            var audioPath = retCopyAudio.Val!;
             // delete old one
-            var oldFilePath = Path.Combine(Directory.GetCurrentDirectory(), video.File);
+            var oldFilePath = Path.Combine(Directory.GetCurrentDirectory(), audio.File);
             DeleteFile(oldFilePath);
-            video.File = videoPath.RefPath;
+            audio.File = audioPath.RefPath;
         }
 
-        if (!VideoOp.ReplaceEntity(video)) {
+        if (!AudioOp.ReplaceEntity(audio)) {
             return RespError(ControllerError.ErrReplaceInDbFailed);
         }
 
@@ -147,28 +146,28 @@ public class VideoController(AppContext appContext) : PkBaseController(appContex
     }
 
     [HttpGet("query")]
-    public IActionResult QueryVideos() {
+    public IActionResult QueryAudios() {
         int page = AsInt(Request.Query[EntityKey.KeyPage]);
         int pageSize = AsInt(Request.Query[EntityKey.KeyPageSize]);
         if (!IsValidInt(page) || !IsValidInt(pageSize)) {
             return RespError(ControllerError.ErrParamErr);
         }
-        var videos = VideoOp.QueryEntities(page, pageSize);
-        FillInVideos(videos);
-        return RespOkData(EntityKey.RespVideos, videos);
+        var audios = AudioOp.QueryEntities(page, pageSize);
+        FillInAudios(audios);
+        return RespOkData(EntityKey.RespAudios, audios);
     }
 
     [HttpGet("query/like/name")]
-    public IActionResult QueryVideosLikeName() {
+    public IActionResult QueryAudiosLikeName() {
         string? name = Request.Query[EntityKey.KeyName];
         int page = AsInt(Request.Query[EntityKey.KeyPage]);
         int pageSize = AsInt(Request.Query[EntityKey.KeyPageSize]);
         if (!IsValidInt(page) || !IsValidInt(pageSize) || IsEmpty(name)) {
             return RespError(ControllerError.ErrParamErr);
         }
-        var videos = VideoOp.QueryEntitiesLikeName(name!, page, pageSize);
-        FillInVideos(videos);
-        return RespOkData(EntityKey.RespVideos, videos);
+        var audios = AudioOp.QueryEntitiesLikeName(name!, page, pageSize);
+        FillInAudios(audios);
+        return RespOkData(EntityKey.RespAudios, audios);
     }
 
     [HttpPost("add/categories")]
@@ -181,11 +180,11 @@ public class VideoController(AppContext appContext) : PkBaseController(appContex
         return RespOk();
     }
 
-    private void FillInVideos(List<Video>? videos) {
-        if (videos == null) {
+    private void FillInAudios(List<Audio>? audios) {
+        if (audios == null) {
             return;
         }
-        foreach (var video in videos) {
+        foreach (var audio in audios) {
             
         }
     }

@@ -42,6 +42,7 @@ public class EntityKey
     public const string RespBookSuit = "BookSuit";
     public const string RespBookSuits = "BookSuits";
     public const string RespAudio = "Audio";
+    public const string RespAudios = "Audios";
     public const string RespAudioSuit = "AudioSuit";
     public const string RespAudioSuits = "AudioSuits";
     public const string RespVideo = "Video";
