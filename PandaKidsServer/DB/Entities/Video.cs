@@ -7,5 +7,5 @@ namespace PandaKidsServer.DB.Entities;
 /// </summary>
 public class Video : Entity
 {
-
+    public string VideoSuitId = "";
 }

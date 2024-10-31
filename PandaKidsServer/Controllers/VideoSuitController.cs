@@ -92,49 +92,44 @@ public class VideoSuitController(AppContext ctx) : PkBaseController(ctx)
     
     [HttpPost("add/video")]
     public IActionResult AddVideo(IFormCollection form) {
-        var entityId = GetFormValue(form, EntityKey.KeyId);
+        var videoSuitId = GetFormValue(form, EntityKey.KeyId);
         var videoId = GetFormValue(form, EntityKey.KeyVideoId);
-        if (IsEmpty(entityId) || IsEmpty(videoId)) {
+        if (IsEmpty(videoSuitId) || IsEmpty(videoId)) {
             return RespError(ControllerError.ErrParamErr);
         }
 
-        var videoSuit = VideoSuitOp.FindEntityById(entityId!);
+        var videoSuit = VideoSuitOp.FindEntityById(videoSuitId!);
         if (videoSuit == null) {
-            return RespError(ControllerError.ErrNoRecordInDb, "VideoSuit:" + entityId);
+            return RespError(ControllerError.ErrNoRecordInDb, "VideoSuit:" + videoSuitId);
         }
-        var book = VideoOp.FindEntityById(videoId!);
-        if (book == null) {
+        var video = VideoOp.FindEntityById(videoId!);
+        if (video == null) {
             return RespError(ControllerError.ErrNoRecordInDb, "Video:" + videoId);
         }
         
-        if (!videoSuit.VideoIds.Contains(videoId!)) {
-            videoSuit.VideoIds.Add(videoId!);
-        }
-        if (!VideoSuitOp.ReplaceEntity(videoSuit)) {
+        video.VideoSuitId = videoSuitId!;
+        if (!VideoOp.ReplaceEntity(video)) {
             return RespError(ControllerError.ErrReplaceInDbFailed);
         }
-        
         return RespOk();
     }
 
     [HttpPost("delete/video")]
     public IActionResult DeleteVideo(IFormCollection form) {
-        var entityId = GetFormValue(form, EntityKey.KeyId);
         var videoId = GetFormValue(form, EntityKey.KeyVideoId);
-        if (IsEmpty(entityId) || IsEmpty(videoId)) {
+        if (IsEmpty(videoId)) {
             return RespError(ControllerError.ErrParamErr);
         }
 
-        var videoSuit = VideoSuitOp.FindEntityById(entityId!);
-        if (videoSuit == null) {
+        var video = VideoOp.FindEntityById(videoId!);
+        if (video == null) {
             return RespError(ControllerError.ErrNoRecordInDb);
         }
 
-        videoSuit.VideoIds.Remove(videoId!);
-        if (!VideoSuitOp.ReplaceEntity(videoSuit)) {
+        video.VideoSuitId = "";
+        if (!VideoOp.ReplaceEntity(video)) {
             return RespError(ControllerError.ErrReplaceInDbFailed);
         }
-
         return RespOk();
     }
 
@@ -147,7 +142,6 @@ public class VideoSuitController(AppContext ctx) : PkBaseController(ctx)
         }
 
         var videoSuits = VideoSuitOp.QueryEntities(page, pageSize);
-        FillInVideoSuit(videoSuits);
         return RespOkData(EntityKey.RespVideoSuits, videoSuits);
     }
     
@@ -162,7 +156,6 @@ public class VideoSuitController(AppContext ctx) : PkBaseController(ctx)
         }
         
         var videoSuits = VideoSuitOp.QueryEntitiesLikeName(name!, page, pageSize);
-        FillInVideoSuit(videoSuits);
         return RespOkData(EntityKey.RespVideoSuits, videoSuits);
     }
     
@@ -174,22 +167,5 @@ public class VideoSuitController(AppContext ctx) : PkBaseController(ctx)
     [HttpGet("query/category")]
     public IActionResult QueryByCategory() {
         return RespOk();
-    }
-    
-    private void FillInVideoSuit(List<VideoSuit>? videoSuits) {
-        if (videoSuits == null) {
-            return;
-        }
-        foreach (var videoSuit in videoSuits) {
-            foreach (var videoId in videoSuit.VideoIds) {
-                if (!IsValidId(videoId)) {
-                    continue;
-                }
-                var video = VideoOp.FindEntityById(videoId);
-                if (video != null) {
-                    videoSuit.Videos.Add(video);
-                }
-            }
-        }
     }
 }

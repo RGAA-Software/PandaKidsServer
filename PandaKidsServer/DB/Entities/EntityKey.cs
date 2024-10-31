@@ -34,6 +34,8 @@ public class EntityKey
     public const string KeyVideoId = "VideoId";
 
     public const string KeyBookId = "BookId";
+
+    public const string KeyVideoSuitPath = "VideoSuitPath";
     
     // response
     public const string RespCount = "Count";

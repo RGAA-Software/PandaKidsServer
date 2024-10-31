@@ -11,7 +11,8 @@ public class VideoSuit : Entity
 
     public string Details = "";
 
-    public List<string> VideoIds = [];
+    // automatically added
+    public string VideoSuitPath = "";
     
     [BsonIgnore]
     public List<Video> Videos = [];

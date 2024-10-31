@@ -11,10 +11,10 @@ public class PresetBaseInfo
     // categories
     public List<string> SuitCategories { set; get; } = [];
     // type
-    public string ElementType { set; get; } = "";
+    public string SuitType { set; get; } = "";
 
     public override string ToString() {
-        var msg = $"{nameof(ElementType)}: {ElementType}," +
+        var msg = $"{nameof(SuitType)}: {SuitType}," +
             $" {nameof(SuitName)}: {SuitName}, " +
             $"{nameof(SuitSummary)}: {SuitSummary}, " +
             $"{nameof(SuitAuthor)}: {SuitAuthor},";

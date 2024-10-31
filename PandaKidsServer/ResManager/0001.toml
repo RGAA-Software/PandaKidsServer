@@ -11,6 +11,6 @@ SuitAuthor = ""
 # cartoon / documentary / 
 SuitCategories = ["", "", ""]
 
-### Element Type
+### Suit Type
 # video / audio / book / image
-ElementType = ""
+SuitType = ""
