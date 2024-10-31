@@ -3,10 +3,25 @@
 public class PresetBaseInfo
 {
     // name
-    public string Name { set; get; } = "";
-    // description
-    public string Description { set; get; } = "";
+    public string SuitName { set; get; } = "";
+    // summary
+    public string SuitSummary { set; get; } = "";
     // author
-    public string Author { set; get; } = "";
-    
+    public string SuitAuthor { set; get; } = "";
+    // categories
+    public List<string> SuitCategories { set; get; } = [];
+    // type
+    public string ElementType { set; get; } = "";
+
+    public override string ToString() {
+        var msg = $"{nameof(ElementType)}: {ElementType}," +
+            $" {nameof(SuitName)}: {SuitName}, " +
+            $"{nameof(SuitSummary)}: {SuitSummary}, " +
+            $"{nameof(SuitAuthor)}: {SuitAuthor},";
+        msg += "Categories: ";
+        foreach (var suitCategory in SuitCategories) {
+            msg += suitCategory + ",";
+        }
+        return msg;
+    }
 }

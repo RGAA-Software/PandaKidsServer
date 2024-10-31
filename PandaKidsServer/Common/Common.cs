@@ -69,34 +69,53 @@ public static class Common
             return false;
         }
     }
-    
-    public static void TraverseDirectory(string currentDirectory)  {
-        string[] files = Directory.GetFiles(currentDirectory);
-        foreach (string file in files)  {
-            Console.WriteLine("File: " + file);
-        }
-        
-        string[] subDirectories = Directory.GetDirectories(currentDirectory);
-        foreach (string subDir in subDirectories)  {
-            Console.WriteLine("Directory: " + subDir);
-            TraverseDirectory(subDir);
-        }
+
+    public static string GetFileName(string absPath) {
+        return Path.GetFileName(absPath);
     }
 
-    public delegate void OnDirectoryCallback(string path);
-    public delegate void OnFileCallback(string path);
+    public static string GetFileExtension(string absPath) {
+        return Path.GetExtension(absPath);
+    }
+
+    public static string GetFileNameWithoutExtension(string absPath) {
+        return Path.GetFileNameWithoutExtension(absPath);
+    }
+
+    public delegate bool OnDirectoryCallback(string path);
+    public delegate bool OnFileCallback(string path);
+    
+    public static void TraverseDirectory(string currentDirectory, OnDirectoryCallback directoryCallback)  {
+        // string[] files = Directory.GetFiles(currentDirectory);
+        // foreach (string file in files)  {
+        //     Console.WriteLine("File: " + file);
+        // }
+        //
+        var subDirectories = Directory.GetDirectories(currentDirectory);
+        foreach (var subDir in subDirectories)  {
+            if (directoryCallback.Invoke(subDir)) {
+                break;
+            }
+
+            TraverseDirectory(subDir, directoryCallback);
+        }
+    }
     
     public static void Traverse1LevelDirectories(string path, OnDirectoryCallback cbk) {
         var subDirectories = Directory.GetDirectories(path);
         foreach (var subDir in subDirectories)  {
-            cbk.Invoke(subDir);
+            if (cbk.Invoke(subDir)) {
+                break;
+            }
         }
     }
 
     public static void Traverse1LevelFiles(string path, OnFileCallback cbk) {
         var files = Directory.GetFiles(path);
         foreach (var file in files) {
-            cbk.Invoke(file);
+            if (cbk.Invoke(file)) {
+                break;
+            }
         }
     }
 }

@@ -10,5 +10,6 @@
     &lt;TestId&gt;NUnit3x::2D3ECE3C-18B8-4D31-B49E-8D67FC257619::net8.0::Tests.TestBookCollection.TestInputAudio&lt;/TestId&gt;&#xD;
     &lt;TestId&gt;NUnit3x::2D3ECE3C-18B8-4D31-B49E-8D67FC257619::net8.0::Tests.TestBookCollection.TestReplaceBook&lt;/TestId&gt;&#xD;
     &lt;TestId&gt;NUnit3x::2D3ECE3C-18B8-4D31-B49E-8D67FC257619::net8.0::Tests.TestBookCollection.TestInputBook&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::2D3ECE3C-18B8-4D31-B49E-8D67FC257619::net8.0::Tests.TestPresetResource.LoadPresetResources&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>

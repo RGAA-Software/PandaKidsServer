@@ -1,0 +1,16 @@
+### Suit Name
+SuitName = ""
+
+### Suit Summary
+SuitSummary = ""
+
+### Suit Author
+SuitAuthor = ""
+
+### Suit Categories
+# cartoon / documentary / 
+SuitCategories = ["", "", ""]
+
+### Element Type
+# video / audio / book / image
+ElementType = ""
