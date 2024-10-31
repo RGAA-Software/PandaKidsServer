@@ -8,8 +8,7 @@ public class EntityKey
     public const string KeySummary = "Summary";
     public const string KeyContent = "Content";
     public const string KeyDetails = "Details";
-    public const string KeyVideoIds = "VideoIds";
-    public const string KeyAudioIds = "AudioIds";
+    public const string KeyVideoSuitId = "VideoSuitId";
 
     // form
     public const string KeyFile = "File";

@@ -109,12 +109,14 @@ public class PresetResManager
                             videoOp.InsertEntity(new Video {
                                 Name = GetFileNameWithoutExtension(filePath),
                                 VideoSuitId = suitEntity.Id.ToString(),
+                                File = refPath,
                             });
                         }
                         else {
                             // todo: update it
                             videoEntity.VideoSuitId = suitEntity.Id.ToString();
                             videoEntity.Name = GetFileNameWithoutExtension(filePath);
+                            videoEntity.File = refPath;
                             videoOp.ReplaceEntity(videoEntity);
                         }
                     } 

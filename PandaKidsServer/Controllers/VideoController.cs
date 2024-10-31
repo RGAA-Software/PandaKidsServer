@@ -148,12 +148,19 @@ public class VideoController(AppContext appContext) : PkBaseController(appContex
 
     [HttpGet("query")]
     public IActionResult QueryVideos() {
+        string? videoSuitId = Request.Query[EntityKey.KeyVideoSuitId];
         int page = AsInt(Request.Query[EntityKey.KeyPage]);
         int pageSize = AsInt(Request.Query[EntityKey.KeyPageSize]);
         if (!IsValidInt(page) || !IsValidInt(pageSize)) {
             return RespError(ControllerError.ErrParamErr);
         }
-        var videos = VideoOp.QueryEntities(page, pageSize);
+
+        List<Video> videos;
+        if (!IsEmpty(videoSuitId)) {
+            videos = VideoOp.QueryEntities(videoSuitId!, page, pageSize);
+        } else {
+            videos = VideoOp.QueryEntities(page, pageSize);
+        }
         FillInVideos(videos);
         return RespOkData(EntityKey.RespVideos, videos);
     }
