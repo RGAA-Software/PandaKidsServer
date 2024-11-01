@@ -8,8 +8,10 @@ namespace PandaKidsServer.ResManager;
 
 public class PresetResManager
 {
-    private const string BaseInfoName = "0001.toml";
-    private const string CoverName = "cover"; // jpg or png
+    private const string ConfigPrefix = "0001";
+    private const string ConfigFile = ConfigPrefix + ".toml";
+    private const string ConfigCoverJpg = ConfigPrefix + ".jpg";
+    private const string ConfigCoverPng = ConfigPrefix + ".png";
     private const string SuitVideo = "video";
     private const string SuitAudio = "audio";
     private const string SuitBook = "book";
@@ -30,21 +32,47 @@ public class PresetResManager
     public bool ReloadAllResources() {
         var presetPath = _appContext.GetResManager().GetPresetPath();
         TraverseDirectory(presetPath, folderPath => {
-            var foundBaseInfoConfig = false;
-            var foundBaseInfoConfigPath = "";
+            var configPath = "";
+            var configCoverPath = "";
             Traverse1LevelFiles(folderPath, filePath => {
-                if (GetFileName(filePath) != BaseInfoName) {
-                    return false;
+                var fileName = GetFileName(filePath);
+                if (fileName == ConfigFile) {
+                    configPath = filePath;    
+                } 
+                else if (fileName == ConfigCoverJpg || fileName == ConfigCoverPng) {
+                    configCoverPath = filePath;
                 }
-                foundBaseInfoConfig = true;
-                foundBaseInfoConfigPath = filePath;
-                return true;
+
+                if (!IsEmpty(configPath) && !IsEmpty(configCoverPath)) {
+                    return true;
+                }
+                return false;
             });
-            
-            if (foundBaseInfoConfig) {
+
+            Image? imageEntity = null;
+            if (!IsEmpty(configCoverPath)) {
+                var imageOp = _appContext.GetDatabase().GetImageOperator();
+                var resPath = _appContext.GetSettings().ResPath;
+                if (configCoverPath.Contains(resPath)) {
+                    var refCoverPath = configCoverPath[(resPath.Length+1)..];
+                    Console.WriteLine("CoverPath: " + refCoverPath);
+                    imageEntity = imageOp.FindEntityByFilePath(refCoverPath);
+                    if (imageEntity == null) {
+                        imageOp.InsertEntity(new Image {
+                            File = refCoverPath,
+                        });
+                    }
+                    else {
+                        imageEntity.File = refCoverPath;
+                        imageOp.ReplaceEntity(imageEntity);
+                    }
+                }
+            }
+
+            if (!IsEmpty(configPath)) {
                 Console.WriteLine("Found Folder: " + folderPath);
-                Console.WriteLine("Found base info config : " + foundBaseInfoConfigPath);
-                var config = LoadPresetBaseInfo(foundBaseInfoConfigPath);
+                Console.WriteLine("Found base info config : " + configPath);
+                var config = LoadPresetBaseInfo(configPath);
                 if (config == null) {
                     return false;
                 }
@@ -56,6 +84,8 @@ public class PresetResManager
                     suitEntity = op.FindEntityByVideoSuitPath(folderPath);
                     if (suitEntity == null) {
                         suitEntity = op.InsertEntity(new VideoSuit {
+                            Cover = imageEntity != null ? imageEntity.File : "",
+                            CoverId = imageEntity != null ? imageEntity.Id.ToString() : "",
                             Name = config.SuitName,
                             Summary = config.SuitSummary,
                             Author = config.SuitAuthor,
@@ -65,6 +95,8 @@ public class PresetResManager
                     }
                     else {
                         var videoSuitEntity = (VideoSuit)suitEntity;
+                        videoSuitEntity.Cover = imageEntity != null ? imageEntity.File : "";
+                        videoSuitEntity.CoverId = imageEntity != null ? imageEntity.Id.ToString() : "";
                         videoSuitEntity.Name = config.SuitName;
                         videoSuitEntity.Summary = config.SuitSummary;
                         videoSuitEntity.Author = config.SuitAuthor;
@@ -89,7 +121,7 @@ public class PresetResManager
                 }
 
                 Traverse1LevelFiles(folderPath, filePath => {
-                    if (filePath == foundBaseInfoConfigPath) {
+                    if (filePath == configPath) {
                         return false;
                     }
                     
