@@ -1,10 +1,13 @@
-﻿using Serilog;
+﻿using System.Runtime.InteropServices;
+using System.Text;
+using PandaKidsServer.Decrypter;
+using Serilog;
 using static System.Int32;
 
 namespace PandaKidsServer.ResManager;
 
 public class StreamRange(HttpContext ctx)  {
-    private const int HttpRangeSize = 1024 * 1024 * 5;
+    private const int HttpRangeSize = 1024 * 1024 * 1;
     private readonly HttpRequest _request = ctx.Request;
     private readonly HttpResponse _response = ctx.Response;
 
@@ -38,9 +41,24 @@ public class StreamRange(HttpContext ctx)  {
                 WriteRangeStream(fs, start, end);
             }
             else {
-                int l;
+                int length;
                 var buffer = new byte[40960];
-                while ((l = fs.Read(buffer, 0, buffer.Length)) > 0) _response.Body.Write(buffer, 0, l);
+                var key = new byte[32];
+                while ((length = fs.Read(buffer, 0, buffer.Length)) > 0) {
+                    long allocPtr = 0;
+                    try {
+                        var decryptPtr = StreamDecrypter.DecryptBuffer(key, key.Length, buffer, buffer.Length);
+                        allocPtr = decryptPtr.ToInt64();
+                        var byteArray = new byte[buffer.Length];
+                        Marshal.Copy(decryptPtr, byteArray, 0, buffer.Length);
+                        _response.Body.Write(byteArray, 0, length);
+                    }
+                    finally {
+                        if (allocPtr != 0) {
+                            StreamDecrypter.ReleaseBuffer(allocPtr);
+                        }
+                    }
+                }
             }
         }
     }
@@ -85,7 +103,21 @@ public class StreamRange(HttpContext ctx)  {
                     readLen -= total - rangLen;
                     total = rangLen;
                 }
-                _response.Body.Write(buffer, 0, readLen);
+
+                long allocPtr = 0;
+                try {
+                    var key = new byte[32];
+                    var decryptPtr = StreamDecrypter.DecryptBuffer(key, key.Length, buffer, readLen);
+                    allocPtr = decryptPtr.ToInt64();
+                    var byteArray = new byte[readLen];
+                    Marshal.Copy(decryptPtr, byteArray, 0, readLen);
+                    _response.Body.Write(byteArray, 0, readLen);
+                }
+                finally {
+                    if (allocPtr != 0) {
+                        StreamDecrypter.ReleaseBuffer(allocPtr);
+                    }
+                }
             }
         }
         catch (Exception ex) {

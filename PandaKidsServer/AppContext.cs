@@ -1,5 +1,6 @@
 ﻿using MongoDB.Driver;
 using Nett;
+using PandaKidsServer.Common;
 using PandaKidsServer.DB;
 using PandaKidsServer.OnlineUser;
 using PandaKidsServer.ResManager;
@@ -20,6 +21,7 @@ public class AppContext
         _settings = Toml.ReadFile(settingsPath).Get<Settings>(); 
         _settings.CheckParams();
         Log.Information("settings: " + _settings.Dump());
+        StartClearThread();
     }
 
     public void Init() {
@@ -52,5 +54,14 @@ public class AppContext
 
     public PresetResManager GetPresetResManager() {
         return _presetResManager;
+    }
+
+    private void StartClearThread() {
+        new Thread(() => {
+            for (;;) {
+                Thread.Sleep(1000 * 600);
+                MemoryClean.ClearMemory();
+            }
+        }).Start();
     }
 }

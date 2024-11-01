@@ -1,4 +1,6 @@
-﻿using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
+﻿using System.Web;
+using Microsoft.AspNetCore.Http.Extensions;
+using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 
 namespace PandaKidsServer.ResManager;
 
@@ -10,31 +12,38 @@ public class OuterImgMiddleware(RequestDelegate next, IHostingEnvironment env)
         var path = context.Request.Path.ToString();
         var prefix = "/pandakids/stream";
         if (context.Request.Method == "GET" && !string.IsNullOrEmpty(path) && path.Contains(prefix)) {
-            path = path.Substring(prefix.Length);
-            var s = RootPath + path;
-            var file = new FileInfo(s);
+            var url = context.Request.GetDisplayUrl();
+            var decodedUrl = HttpUtility.UrlDecode(url);
+            
+            var uri = new Uri(decodedUrl);
+            var decodedPath = uri.LocalPath;
+            decodedPath = decodedPath[prefix.Length..];
+            var displayFilePath = RootPath + decodedPath;
+            
+            var file = new FileInfo(displayFilePath);
             if (!file.Exists) {
+                Console.WriteLine("File not exists:" + displayFilePath);
                 return;
             }
+            
             var length = path.LastIndexOf('.') - path.LastIndexOf('/') - 1;
-            Console.WriteLine("file length: " + length + ", file length: " + file.Length);
             context.Response.Headers["Etag"] = path.Substring(path.LastIndexOf('/') + 1, length);
             context.Response.Headers["Accept-Ranges"] = "bytes";
             // context.Response.Headers["Content-Length"] = file.Length.ToString();
             if (path.EndsWith(".mp4")) {
                 context.Response.ContentType = "video/mp4";
                 var stream = new StreamRange(context);
-                stream.WriteFile(s);
+                stream.WriteFile(displayFilePath);
             }
             else if (path.EndsWith(".mp3")) {
                 context.Response.ContentType = "video/mp3";
                 var stream = new StreamRange(context);
-                stream.WriteFile(s);
+                stream.WriteFile(displayFilePath);
             }
             else {
                 context.Response.ContentType = "image/jpeg";
                 context.Response.Headers["Cache-Control"] = "public";
-                await context.Response.SendFileAsync(s);
+                await context.Response.SendFileAsync(displayFilePath);
             }
             return;
         }
