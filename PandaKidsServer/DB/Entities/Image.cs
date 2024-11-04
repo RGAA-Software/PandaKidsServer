@@ -5,5 +5,5 @@
 /// </summary>
 public class Image : Entity
 {
-    
+    public string ImageSuitId = "";
 }

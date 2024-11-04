@@ -22,4 +22,6 @@ public class Book : Entity
     
     [BsonIgnore]
     public List<Video> Videos = [];
+    
+    public string BookSuitId = "";
 }

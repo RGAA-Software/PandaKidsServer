@@ -15,4 +15,7 @@ public class BookSuit : Entity
     
     [BsonIgnore]
     public List<Book> Books = [];
+    
+    // automatically added
+    public string BookSuitPath = "";
 }

@@ -14,3 +14,6 @@ SuitCategories = ["", "", ""]
 ### Suit Type
 # video / audio / book / image
 SuitType = ""
+
+### Grade
+Grade = "K1,K2,K3,K4"

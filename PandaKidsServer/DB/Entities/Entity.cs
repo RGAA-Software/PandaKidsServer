@@ -24,6 +24,9 @@ public abstract class Entity
     public string File = "";
 
     public List<string> Categories = [];
+
+    // K1 ~ K12
+    public string Grade = "";
     
     public string ToJson() {
         return JsonConvert.SerializeObject(this);

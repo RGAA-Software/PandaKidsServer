@@ -7,4 +7,8 @@ public class ImageSuitOperator : CollectionOperator<ImageSuit>
 {
     public ImageSuitOperator(AppContext ctx, IMongoCollection<ImageSuit> collection) : base(ctx, collection) {
     }
+    
+    public ImageSuit? FindEntityByImageSuitPath(string path) {
+        return Collection.Find(Builders<ImageSuit>.Filter.Eq(EntityKey.KeyImageSuitPath, path)).FirstOrDefault();
+    }
 }

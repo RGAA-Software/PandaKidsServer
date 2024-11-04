@@ -12,4 +12,6 @@ public class AudioSuit : Entity
     
     [BsonIgnore]
     public List<Audio> Audios = [];
+
+    public string AudioSuitPath = "";
 }

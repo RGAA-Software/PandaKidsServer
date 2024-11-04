@@ -5,5 +5,5 @@
 /// </summary>
 public class Audio : Entity
 {
-    
+    public string AudioSuitId = "";
 }

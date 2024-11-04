@@ -35,6 +35,12 @@ public class EntityKey
     public const string KeyBookId = "BookId";
 
     public const string KeyVideoSuitPath = "VideoSuitPath";
+
+    public const string KeyBookSuitPath = "BookSuitPath";
+    
+    public const string KeyAudioSuitPath = "AudioSuitPath";
+
+    public const string KeyImageSuitPath = "AudioSuitPath";
     
     // response
     public const string RespCount = "Count";
