@@ -7,14 +7,9 @@ namespace PandaKidsServer.DB.Entities;
 /// </summary>
 public class BookSuit : Entity
 {
-    public List<string> BookIds = [];
-    
     public string Content = "";
 
     public string Details = "";
-    
-    [BsonIgnore]
-    public List<Book> Books = [];
     
     // automatically added
     public string BookSuitPath = "";

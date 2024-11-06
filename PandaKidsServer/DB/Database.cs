@@ -20,6 +20,7 @@ public class Database
     private UserOperator _userOperator;
     private VideoOperator _videoOperator;
     private VideoSuitOperator _videoSuitOperator;
+    private SeriesOperator _seriesOperator;
 
     public Database(AppContext ctx) {
         _appContext = ctx;
@@ -38,6 +39,7 @@ public class Database
             _mongoDatabase.CreateCollection(nameof(VideoSuit));
             _mongoDatabase.CreateCollection(nameof(Image));
             _mongoDatabase.CreateCollection(nameof(ImageSuit));
+            _mongoDatabase.CreateCollection(nameof(Series));
         }
         catch (Exception e) {
             Log.Error("Connect to mongodb failed: " + e);
@@ -71,6 +73,9 @@ public class Database
         var imageSuitCollection = _mongoDatabase.GetCollection<ImageSuit>(nameof(ImageSuit));
         _imageSuitOperator = new ImageSuitOperator(_appContext, imageSuitCollection);
 
+        var seriesCollection = _mongoDatabase.GetCollection<Series>(nameof(Series));
+        _seriesOperator = new SeriesOperator(_appContext, seriesCollection);
+        
         return true;
     }
 
@@ -108,5 +113,9 @@ public class Database
 
     public ImageSuitOperator GetImageSuitOperator() {
         return _imageSuitOperator;
+    }
+
+    public SeriesOperator GetSeriesOperator() {
+        return _seriesOperator;
     }
 }

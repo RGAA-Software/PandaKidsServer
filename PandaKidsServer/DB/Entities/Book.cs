@@ -11,14 +11,8 @@ public class Book : Entity
 
     public string Details = "";
 
-    // audio's object id
-    public List<string> AudioIds = [];
-
     [BsonIgnore]
     public List<Audio> Audios = [];
-    
-    // video's object id
-    public List<string> VideoIds = [];
     
     [BsonIgnore]
     public List<Video> Videos = [];

@@ -12,20 +12,26 @@ public class PresetBaseInfo
     public List<string> SuitCategories { set; get; } = [];
     // type
     public string SuitType { set; get; } = "";
-    // grade
-    public string Grade { set; get; } = "";
+    // grades
+    public List<string> Grades { set; get; } = [];
     
     public override string ToString() {
         var msg = $"{nameof(SuitType)}: {SuitType}," +
             $" {nameof(SuitName)}: {SuitName}, " +
             $"{nameof(SuitSummary)}: {SuitSummary}, " +
-            $"{nameof(SuitAuthor)}: {SuitAuthor}," +
-            $"{nameof(Grade)}: {Grade},"
+            $"{nameof(SuitAuthor)}: {SuitAuthor},"
             ;
-        msg += "Categories: ";
+        
+        msg += "\nCategories: ";
         foreach (var suitCategory in SuitCategories) {
             msg += suitCategory + ",";
         }
+
+        msg += "\nGrade: ";
+        foreach (var grade in Grades) {
+            msg += grade + ",";
+        }
+        
         return msg;
     }
 }

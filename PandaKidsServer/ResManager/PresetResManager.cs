@@ -62,7 +62,7 @@ public class PresetResManager
                     Console.WriteLine("==>CoverPath: " + refCoverPath);
                     imageEntity = imageOp.FindEntityByFilePath(refCoverPath);
                     if (imageEntity == null) {
-                        imageOp.InsertEntity(new Image {
+                        imageEntity = imageOp.InsertEntity(new Image {
                             File = refCoverPath,
                         });
                     }
@@ -97,7 +97,7 @@ public class PresetResManager
                             Author = config.SuitAuthor,
                             Categories = config.SuitCategories,
                             VideoSuitPath = folderPath,
-                            Grade = config.Grade,
+                            Grades = config.Grades,
                         });
                     }
                     else {
@@ -109,7 +109,7 @@ public class PresetResManager
                         videoSuitEntity.Author = config.SuitAuthor;
                         videoSuitEntity.Categories = config.SuitCategories;
                         videoSuitEntity.VideoSuitPath = folderPath;
-                        videoSuitEntity.Grade = config.Grade;
+                        videoSuitEntity.Grades = config.Grades;
                         op.ReplaceEntity(videoSuitEntity);
                     }
                 } 
@@ -126,7 +126,7 @@ public class PresetResManager
                             Author = config.SuitAuthor,
                             Categories = config.SuitCategories,
                             AudioSuitPath = folderPath,
-                            Grade = config.Grade,
+                            Grades = config.Grades,
                         });
                     }
                     else {
@@ -138,7 +138,7 @@ public class PresetResManager
                         audioSuitEntity.Author = config.SuitAuthor;
                         audioSuitEntity.Categories = config.SuitCategories;
                         audioSuitEntity.AudioSuitPath = folderPath;
-                        audioSuitEntity.Grade = config.Grade;
+                        audioSuitEntity.Grades = config.Grades;
                         op.ReplaceEntity(audioSuitEntity);
                     }
                 } 
@@ -155,7 +155,7 @@ public class PresetResManager
                             Author = config.SuitAuthor,
                             Categories = config.SuitCategories,
                             BookSuitPath = folderPath,
-                            Grade = config.Grade,
+                            Grades = config.Grades,
                         });
                     }
                     else {
@@ -167,7 +167,7 @@ public class PresetResManager
                         bookSuitEntity.Author = config.SuitAuthor;
                         bookSuitEntity.Categories = config.SuitCategories;
                         bookSuitEntity.BookSuitPath = folderPath;
-                        bookSuitEntity.Grade = config.Grade;
+                        bookSuitEntity.Grades = config.Grades;
                         op.ReplaceEntity(bookSuitEntity);
                     }
                 } 
@@ -184,7 +184,7 @@ public class PresetResManager
                             Author = config.SuitAuthor,
                             Categories = config.SuitCategories,
                             ImageSuitPath = folderPath,
-                            Grade = config.Grade,
+                            Grades = config.Grades,
                         });
                     }
                     else {
@@ -196,7 +196,7 @@ public class PresetResManager
                         imageSuitEntity.Author = config.SuitAuthor;
                         imageSuitEntity.Categories = config.SuitCategories;
                         imageSuitEntity.ImageSuitPath = folderPath;
-                        imageSuitEntity.Grade = config.Grade;
+                        imageSuitEntity.Grades = config.Grades;
                         op.ReplaceEntity(imageSuitEntity);
                     }
                 }
@@ -230,7 +230,7 @@ public class PresetResManager
                                 Name = GetFileNameWithoutExtension(filePath),
                                 VideoSuitId = suitEntity.Id.ToString(),
                                 File = refPath,
-                                Grade = config.Grade,
+                                Grades = config.Grades,
                             });
                         }
                         else {
@@ -238,7 +238,7 @@ public class PresetResManager
                             videoEntity.VideoSuitId = suitEntity.Id.ToString();
                             videoEntity.Name = GetFileNameWithoutExtension(filePath);
                             videoEntity.File = refPath;
-                            videoEntity.Grade = config.Grade;
+                            videoEntity.Grades = config.Grades;
                             videoOp.ReplaceEntity(videoEntity);
                         }
                     } 
@@ -260,7 +260,7 @@ public class PresetResManager
                                 Name = GetFileNameWithoutExtension(filePath),
                                 AudioSuitId = suitEntity.Id.ToString(),
                                 File = refPath,
-                                Grade = config.Grade,
+                                Grades = config.Grades,
                             });
                         }
                         else {
@@ -268,7 +268,7 @@ public class PresetResManager
                             audioEntity.AudioSuitId = suitEntity.Id.ToString();
                             audioEntity.Name = GetFileNameWithoutExtension(filePath);
                             audioEntity.File = refPath;
-                            audioEntity.Grade = config.Grade;
+                            audioEntity.Grades = config.Grades;
                             audioOp.ReplaceEntity(audioEntity);
                         }
                     } 
@@ -290,7 +290,7 @@ public class PresetResManager
                                 Name = GetFileNameWithoutExtension(filePath),
                                 BookSuitId = suitEntity.Id.ToString(),
                                 File = refPath,
-                                Grade = config.Grade,
+                                Grades = config.Grades,
                             });
                         }
                         else {
@@ -298,7 +298,7 @@ public class PresetResManager
                             bookEntity.BookSuitId = suitEntity.Id.ToString();
                             bookEntity.Name = GetFileNameWithoutExtension(filePath);
                             bookEntity.File = refPath;
-                            bookEntity.Grade = config.Grade;
+                            bookEntity.Grades = config.Grades;
                             bookOp.ReplaceEntity(bookEntity);
                         }
                     } 
@@ -320,14 +320,14 @@ public class PresetResManager
                                 Name = GetFileNameWithoutExtension(filePath),
                                 ImageSuitId = suitEntity.Id.ToString(),
                                 File = refPath,
-                                Grade = config.Grade,
+                                Grades = config.Grades,
                             });
                         }
                         else {
                             imgEntity.ImageSuitId = suitEntity.Id.ToString();
                             imgEntity.Name = GetFileNameWithoutExtension(filePath);
                             imgEntity.File = refPath;
-                            imgEntity.Grade = config.Grade;
+                            imgEntity.Grades = config.Grades;
                             imageOp.ReplaceEntity(imgEntity);
                         }
                     }

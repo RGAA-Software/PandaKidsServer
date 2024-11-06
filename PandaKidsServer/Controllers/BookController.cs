@@ -113,17 +113,17 @@ public class BookController : PkBaseController
             File = pdfPath.RefPath,
         };
         
-        foreach (var audioPath in audioPaths) {
-            if (audioPath.Extra != null) {
-                book.AudioIds.Add(audioPath.Extra!);   
-            }
-        }
-
-        foreach (var videoPath in videoPaths) {
-            if (videoPath.Extra != null) {
-                book.VideoIds.Add(videoPath.Extra!);
-            }
-        }
+        // foreach (var audioPath in audioPaths) {
+        //     if (audioPath.Extra != null) {
+        //         book.AudioIds.Add(audioPath.Extra!);   
+        //     }
+        // }
+        //
+        // foreach (var videoPath in videoPaths) {
+        //     if (videoPath.Extra != null) {
+        //         book.VideoIds.Add(videoPath.Extra!);
+        //     }
+        // }
         
         var existBook = BookOp.FindEntityByFilePath(book.File);
         if (existBook != null) {
@@ -274,10 +274,11 @@ public class BookController : PkBaseController
             return RespError(ControllerError.ErrNoRecordInDb);
         }
 
-        book.AudioIds.Remove(audioId!);
-        if (!BookOp.ReplaceEntity(book)) {
-            return RespError(ControllerError.ErrReplaceInDbFailed);
-        }
+        //todo:
+        // book.AudioIds.Remove(audioId!);
+        // if (!BookOp.ReplaceEntity(book)) {
+        //     return RespError(ControllerError.ErrReplaceInDbFailed);
+        // }
         return RespOk();
     }
     
@@ -294,10 +295,11 @@ public class BookController : PkBaseController
             return RespError(ControllerError.ErrNoRecordInDb);
         }
 
-        book.VideoIds.Remove(videoId!);
-        if (!BookOp.ReplaceEntity(book)) {
-            return RespError(ControllerError.ErrReplaceInDbFailed);
-        }
+        //todo:
+        // book.VideoIds.Remove(videoId!);
+        // if (!BookOp.ReplaceEntity(book)) {
+        //     return RespError(ControllerError.ErrReplaceInDbFailed);
+        // }
         return RespOk();
     }
     
@@ -335,15 +337,16 @@ public class BookController : PkBaseController
                 audioPath.Extra = entity.GetId();
             }   
         }
-        
-        foreach (var audioPath in audioPaths) {
-            if (audioPath.Extra != null) {
-                var newAudioId = audioPath.Extra!;
-                if (!book.AudioIds.Contains(newAudioId)) {
-                    book.AudioIds.Add(newAudioId);   
-                }
-            }
-        }
+
+        //todo:
+        // foreach (var audioPath in audioPaths) {
+        //     if (audioPath.Extra != null) {
+        //         var newAudioId = audioPath.Extra!;
+        //         if (!book.AudioIds.Contains(newAudioId)) {
+        //             book.AudioIds.Add(newAudioId);   
+        //         }
+        //     }
+        // }
 
         if (!BookOp.ReplaceEntity(book)) {
             return RespError(ControllerError.ErrReplaceInDbFailed);
@@ -386,15 +389,16 @@ public class BookController : PkBaseController
                 videoPath.Extra = entity.GetId();
             }   
         }
-        
-        foreach (var videoPath in videoPaths) {
-            if (videoPath.Extra != null) {
-                var newVideoId = videoPath.Extra!;
-                if (!book.VideoIds.Contains(newVideoId)) {
-                    book.VideoIds.Add(newVideoId);
-                }
-            }
-        }
+
+        //todo:
+        // foreach (var videoPath in videoPaths) {
+        //     if (videoPath.Extra != null) {
+        //         var newVideoId = videoPath.Extra!;
+        //         if (!book.VideoIds.Contains(newVideoId)) {
+        //             book.VideoIds.Add(newVideoId);
+        //         }
+        //     }
+        // }
 
         if (!BookOp.ReplaceEntity(book)) {
             return RespError(ControllerError.ErrReplaceInDbFailed);
@@ -416,27 +420,28 @@ public class BookController : PkBaseController
         if (books == null) {
             return;
         }
-
-        foreach (var book in books) {
-            foreach (var bookAudioId in book.AudioIds) {
-                if (!IsValidId(bookAudioId)) {
-                    continue;
-                }
-                var audio = AudioOp.FindEntityById(bookAudioId);
-                if (audio != null) {
-                    book.Audios.Add(audio);
-                }
-            }
-
-            foreach (var bookVideoId in book.VideoIds) {
-                if (!IsValidId(bookVideoId)) {
-                    continue;
-                }
-                var video = VideoOp.FindEntityById(bookVideoId);
-                if (video != null) {
-                    book.Videos.Add(video);
-                }
-            }
-        }
+        
+        //todo:
+        // foreach (var book in books) {
+        //     foreach (var bookAudioId in book.AudioIds) {
+        //         if (!IsValidId(bookAudioId)) {
+        //             continue;
+        //         }
+        //         var audio = AudioOp.FindEntityById(bookAudioId);
+        //         if (audio != null) {
+        //             book.Audios.Add(audio);
+        //         }
+        //     }
+        //
+        //     foreach (var bookVideoId in book.VideoIds) {
+        //         if (!IsValidId(bookVideoId)) {
+        //             continue;
+        //         }
+        //         var video = VideoOp.FindEntityById(bookVideoId);
+        //         if (video != null) {
+        //             book.Videos.Add(video);
+        //         }
+        //     }
+        // }
     }
 }
