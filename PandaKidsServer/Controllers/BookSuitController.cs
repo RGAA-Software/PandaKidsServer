@@ -94,25 +94,23 @@ public class BookSuitController : PkBaseController
 
     [HttpPost("add/book")]
     public IActionResult AddBook(IFormCollection form) {
-        var entityId = GetFormValue(form, EntityKey.KeyId);
+        var bookSuitId = GetFormValue(form, EntityKey.KeyId);
         var bookId = GetFormValue(form, EntityKey.KeyBookId);
-        if (IsEmpty(entityId) || IsEmpty(bookId)) {
+        if (IsEmpty(bookSuitId) || IsEmpty(bookId)) {
             return RespError(ControllerError.ErrParamErr);
         }
 
-        var bookSuit = BookSuitOp.FindEntityById(entityId!);
+        var bookSuit = BookSuitOp.FindEntityById(bookSuitId!);
         if (bookSuit == null) {
-            return RespError(ControllerError.ErrNoRecordInDb, "BookSuit:" + entityId);
+            return RespError(ControllerError.ErrNoRecordInDb, "BookSuit:" + bookSuitId);
         }
         var book = BookOp.FindEntityById(bookId!);
         if (book == null) {
             return RespError(ControllerError.ErrNoRecordInDb, "Book:" + bookId);
         }
+        book.BookSuitId = bookSuitId!;
         
-        if (!bookSuit.BookIds.Contains(bookId!)) {
-            bookSuit.BookIds.Add(bookId!);
-        }
-        if (!BookSuitOp.ReplaceEntity(bookSuit)) {
+        if (!BookOp.ReplaceEntity(book)) {
             return RespError(ControllerError.ErrReplaceInDbFailed);
         }
         
@@ -127,16 +125,10 @@ public class BookSuitController : PkBaseController
             return RespError(ControllerError.ErrParamErr, "Entity id:" + entityId + ", Book id:" + bookId);
         }
 
-        var bookSuit = BookSuitOp.FindEntityById(entityId!);
-        if (bookSuit == null) {
-            return RespError(ControllerError.ErrNoRecordInDb, "BookSuit:" + entityId);
+        var book = BookOp.FindEntityById(bookId!);
+        if (book != null) {
+            BookOp.DeleteEntity(bookId!);
         }
-
-        bookSuit.BookIds.Remove(bookId!);
-        if (!BookSuitOp.ReplaceEntity(bookSuit)) {
-            return RespError(ControllerError.ErrReplaceInDbFailed);
-        }
-
         return RespOk();
     }
 
@@ -149,7 +141,6 @@ public class BookSuitController : PkBaseController
         }
 
         var bookSuits = BookSuitOp.QueryEntities(page, pageSize);
-        FillInBookSuits(bookSuits);
         return RespOkData(EntityKey.RespBookSuits, bookSuits);
     }
 
@@ -163,7 +154,6 @@ public class BookSuitController : PkBaseController
         }
 
         var bookSuits = BookSuitOp.QueryEntitiesLikeName(name!, page, pageSize);
-        FillInBookSuits(bookSuits);
         return RespOkData(EntityKey.RespBookSuits, bookSuits);
     }
 
@@ -175,22 +165,5 @@ public class BookSuitController : PkBaseController
     [HttpGet("query/category")]
     public IActionResult QueryByCategory() {
         return RespOk();
-    }
-    
-    private void FillInBookSuits(List<BookSuit>? bookSuits) {
-        if (bookSuits == null) {
-            return;
-        }
-        foreach (var bookSuit in bookSuits) {
-            foreach (var bookId in bookSuit.BookIds) {
-                if (!IsValidId(bookId)) {
-                    continue;
-                }
-                var book = BookOp.FindEntityById(bookId);
-                if (book != null) {
-                    bookSuit.Books.Add(book);
-                }
-            }
-        }
     }
 }

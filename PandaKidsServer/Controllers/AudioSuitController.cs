@@ -98,25 +98,24 @@ public class AudioSuitController(AppContext ctx) : PkBaseController(ctx)
             return RespError(ControllerError.ErrNoFile);
         }
         
-        var id = GetFormValue(form, EntityKey.KeyId);
-        if (IsEmpty(id)) {
+        var audioSuitId = GetFormValue(form, EntityKey.KeyId);
+        if (IsEmpty(audioSuitId)) {
             return RespError(ControllerError.ErrParamErr);
         }
-        var audioSuit = AudioSuitOp.FindEntityById(id!);
+        var audioSuit = AudioSuitOp.FindEntityById(audioSuitId!);
         if (audioSuit == null) {
             return RespError(ControllerError.ErrNoRecordInDb);
         }
-
-        var audioPaths = new List<BasicPath>();
+        
         foreach (var audioFile in audioFiles) {
             var ret = await CopyAudio(audioFile);
             if (ret.Key == null && ret.Val != null) {
                 var audioPath = ret.Val!;
-                audioPaths.Add(audioPath);
                 // insert into db
                 var entity = AudioOp.InsertEntityIfNotExistByFile(new Audio {
                     Name = audioPath.Name,
                     File = audioPath.RefPath,
+                    AudioSuitId = audioSuitId!,
                 });
                 if (entity == null) {
                     Log.Error("Insert " + audioPath.Name + " to db failed.");
@@ -124,19 +123,6 @@ public class AudioSuitController(AppContext ctx) : PkBaseController(ctx)
                 }
                 audioPath.Extra = entity.GetId();
             }
-        }
-        
-        foreach (var audioPath in audioPaths) {
-            if (audioPath.Extra != null) {
-                var audioId = audioPath.Extra!;
-                if (!audioSuit.AudioIds.Contains(audioId)) {
-                    audioSuit.AudioIds.Add(audioId);
-                }
-            }
-        }
-
-        if (!AudioSuitOp.ReplaceEntity(audioSuit)) {
-            return RespError(ControllerError.ErrReplaceInDbFailed);
         }
         return RespOk();
     }
@@ -153,12 +139,7 @@ public class AudioSuitController(AppContext ctx) : PkBaseController(ctx)
         if (audioSuit == null) {
             return RespError(ControllerError.ErrNoRecordInDb);
         }
-
-        audioSuit.AudioIds.Remove(audioId!);
-        if (!AudioSuitOp.ReplaceEntity(audioSuit)) {
-            return RespError(ControllerError.ErrReplaceInDbFailed);
-        }
-
+        AudioOp.DeleteEntity(audioId!);
         return RespOk();
     }
 
@@ -171,7 +152,6 @@ public class AudioSuitController(AppContext ctx) : PkBaseController(ctx)
         }
 
         var audioSuits = AudioSuitOp.QueryEntities(page, pageSize);
-        FillInAudioSuits(audioSuits);
         return RespOkData(EntityKey.RespAudioSuits, audioSuits);
     }
     
@@ -185,7 +165,6 @@ public class AudioSuitController(AppContext ctx) : PkBaseController(ctx)
         }
         
         var audioSuits = AudioSuitOp.QueryEntitiesLikeName(name!, page, pageSize);
-        FillInAudioSuits(audioSuits);
         return RespOkData(EntityKey.RespAudioSuits, audioSuits);
     }
 
@@ -197,22 +176,5 @@ public class AudioSuitController(AppContext ctx) : PkBaseController(ctx)
     [HttpGet("query/category")]
     public IActionResult QueryByCategory() {
         return RespOk();
-    }
-
-    private void FillInAudioSuits(List<AudioSuit>? audioSuits) {
-        if (audioSuits == null) {
-            return;
-        }
-        foreach (var audioSuit in audioSuits) {
-            foreach (var audioId in audioSuit.AudioIds) {
-                if (!IsValidId(audioId)) {
-                    continue;
-                }
-                var audio = AudioOp.FindEntityById(audioId);
-                if (audio != null) {
-                    audioSuit.Audios.Add(audio);
-                }
-            }
-        }
     }
 }
