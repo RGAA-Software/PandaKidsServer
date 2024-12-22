@@ -98,6 +98,7 @@ public class PresetResManager
                             Categories = config.SuitCategories,
                             VideoSuitPath = folderPath,
                             Grades = config.Grades,
+
                         });
                     }
                     else {
@@ -127,6 +128,7 @@ public class PresetResManager
                             Categories = config.SuitCategories,
                             AudioSuitPath = folderPath,
                             Grades = config.Grades,
+
                         });
                     }
                     else {
@@ -156,6 +158,7 @@ public class PresetResManager
                             Categories = config.SuitCategories,
                             BookSuitPath = folderPath,
                             Grades = config.Grades,
+
                         });
                     }
                     else {
@@ -185,6 +188,7 @@ public class PresetResManager
                             Categories = config.SuitCategories,
                             ImageSuitPath = folderPath,
                             Grades = config.Grades,
+
                         });
                     }
                     else {
@@ -339,5 +343,10 @@ public class PresetResManager
             return false;
         });
         return true;
+    }
+
+    private List<string> ParseGrades(string grade) {
+        var grades = grade.Split(',');
+        return [..grades];
     }
 }
