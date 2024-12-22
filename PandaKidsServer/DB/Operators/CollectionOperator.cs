@@ -8,8 +8,20 @@ namespace PandaKidsServer.DB.Operators;
 
 public abstract class CollectionOperator<T> where T : Entity
 {
-    protected readonly AppContext AppContext;
-    protected readonly IMongoCollection<T> Collection;
+    protected AppContext AppContext;
+    protected IMongoCollection<T> Collection;
+
+    public CollectionOperator() {
+        
+    }
+
+    public void SetAppContext(AppContext ctx) {
+        AppContext = ctx;
+    }
+
+    public void SetCollection(IMongoCollection<T> c) {
+        Collection = c;
+    }
 
     public CollectionOperator(AppContext ctx, IMongoCollection<T> collection) {
         AppContext = ctx;
