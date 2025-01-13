@@ -14,7 +14,7 @@ public class TestAudioCollection
     public void Setup()
     {
         _appContext = new AppContext();
-        _appContext.Init();
+        _appContext.Init(null);
         
         var db = _appContext.GetDatabase();
         _audioOperator = db.GetAudioOperator();

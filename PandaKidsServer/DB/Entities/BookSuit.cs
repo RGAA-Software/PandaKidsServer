@@ -13,4 +13,6 @@ public class BookSuit : Entity
     
     // automatically added
     public string BookSuitPath = "";
+
+    public string Series = "";
 }

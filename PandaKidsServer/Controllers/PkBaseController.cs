@@ -17,6 +17,7 @@ public class PkBaseController : ControllerBase
     protected readonly AudioOperator AudioOp;
     protected readonly AudioSuitOperator AudioSuitOp;
     protected readonly ImageOperator ImageOp;
+    protected readonly SeriesOperator SeriesOp;
     
     public PkBaseController(AppContext ctx) {
         AppCtx = ctx;
@@ -29,6 +30,7 @@ public class PkBaseController : ControllerBase
         AudioSuitOp = db.GetAudioSuitOperator();
         BookSuitOp = db.GetBookSuitOperator();
         VideoSuitOp = db.GetVideoSuitOperator();
+        SeriesOp = db.GetSeriesOperator();
     }
 
     private IActionResult ResponseMessage(int code, string? extra, Dictionary<string, object> data) {

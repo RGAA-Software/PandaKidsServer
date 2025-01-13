@@ -1,7 +1,10 @@
+using System.Reflection;
+using MediatR;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.FileProviders;
 using PandaKidsServer.Common;
 using PandaKidsServer.Handlers;
+using PandaKidsServer.Messages;
 using PandaKidsServer.OnlineUser;
 using PandaKidsServer.ResManager;
 using Serilog;
@@ -16,7 +19,6 @@ Log.Logger = new LoggerConfiguration()
     ).CreateLogger();
 
 var appContext = new AppContext();
-appContext.Init();
 
 var builder = WebApplication.CreateBuilder(args);
 builder.WebHost.UseUrls("http://0.0.0.0:" + appContext.GetSettings().ListenPort);
@@ -24,6 +26,12 @@ builder.Services.AddControllers();
 builder.Services.AddSingleton(appContext);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+//builder.Services.AddMediatR(typeof(AppContext.Timer5SHandler).Assembly);
+builder.Services.AddMediatR(cfg => {
+        cfg.RegisterServicesFromAssemblies(typeof(AppContext.Timer5SHandler).GetTypeInfo().Assembly);
+    }
+);
+
 
 builder.WebHost.ConfigureKestrel(options =>
 {
@@ -32,6 +40,9 @@ builder.WebHost.ConfigureKestrel(options =>
 });
 
 var app = builder.Build();
+
+var mediator = app.Services.GetRequiredService<IMediator>();
+appContext.Init(mediator);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment()) {

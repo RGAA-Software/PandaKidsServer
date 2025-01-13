@@ -59,4 +59,5 @@ public class EntityKey
     public const string RespUser = "User";
     public const string RespImage = "Image";
     public const string RespImageSuit = "ImageSuit";
+    public const string RespSeries = "Series";
 }

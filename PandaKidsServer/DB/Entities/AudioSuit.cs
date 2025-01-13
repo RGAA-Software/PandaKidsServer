@@ -9,4 +9,6 @@ public class AudioSuit : Entity
     public string Details = "";
 
     public string AudioSuitPath = "";
+
+    public string Series = "";
 }

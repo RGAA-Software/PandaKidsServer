@@ -14,12 +14,15 @@ public class PresetBaseInfo
     public string SuitType { set; get; } = "";
     // grades
     public List<string> Grades { set; get; } = [];
+    // series
+    public string Series { get; set; } = "";
     
     public override string ToString() {
         var msg = $"{nameof(SuitType)}: {SuitType}," +
             $" {nameof(SuitName)}: {SuitName}, " +
             $"{nameof(SuitSummary)}: {SuitSummary}, " +
-            $"{nameof(SuitAuthor)}: {SuitAuthor},"
+            $"{nameof(SuitAuthor)}: {SuitAuthor}," +
+            $"{nameof(Series)}: {Series},"
             ;
         
         msg += "\nCategories: ";

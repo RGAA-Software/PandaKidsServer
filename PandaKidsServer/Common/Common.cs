@@ -118,4 +118,37 @@ public static class Common
             }
         }
     }
+
+    // 2008-09-04
+    public static string GetDateByDay() {
+        return DateTime.Now.ToString("yyyy-MM-dd");
+    }
+    
+    // 2008-9-4 20:02:10
+    public static string GetTime() {
+        return DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+    }
+
+    public static string GetTimestampStr() {
+        return new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds().ToString();
+    }
+
+    public static long GetTimestamp() {
+        return new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
+    }
+    
+    public static List<int> GenerateUniqueRandomNumbers(int min, int max)  {
+        if (max - min + 1 <= 0)  {
+            throw new ArgumentException("Range must be at least 5 numbers");
+        }
+        Random random = new Random();
+        HashSet<int> uniqueNumbers = new HashSet<int>();
+
+        while (uniqueNumbers.Count < 5)  {
+            int randomNumber = random.Next(min, max + 1);
+            uniqueNumbers.Add(randomNumber);
+        }
+        return [..uniqueNumbers];
+    }
+    
 }

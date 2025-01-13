@@ -1,4 +1,5 @@
-﻿using PandaKidsServer.ResManager;
+﻿using MediatR;
+using PandaKidsServer.ResManager;
 
 namespace Tests;
 using AppContext = PandaKidsServer.AppContext;
@@ -11,7 +12,7 @@ public class TestPresetResource
     [SetUp]
     public void Setup() {
         _appContext = new AppContext();
-        _appContext.Init();
+        _appContext.Init(null);
         _presetResManager = _appContext.GetPresetResManager();
     }
 

@@ -14,6 +14,10 @@ public class VideoSuit : Entity
     // automatically added
     public string VideoSuitPath = "";
     
+    // refer to a series
+    public string Series = "";
+    
+    // don't save to db, just callback to clients
     [BsonIgnore]
     public List<Video> Videos = [];
 }

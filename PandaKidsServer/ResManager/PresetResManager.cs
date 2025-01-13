@@ -45,7 +45,7 @@ public class PresetResManager
                     configCoverPath = filePath;
                     Console.WriteLine($"coverPath: {configCoverPath}");
                 }
-
+                // break this loop if there are no config file and cover
                 if (!IsEmpty(configPath) && !IsEmpty(configCoverPath)) {
                     return true;
                 }
@@ -82,12 +82,34 @@ public class PresetResManager
                     return false;
                 }
                 Console.WriteLine(config);
+                
+                // process series
+                if (config.Series.Length > 0) {
+                    var op = _appContext.GetDatabase().GetSeriesOperator();
+                    var entity = op.FindEntityByName(config.Series);
+                    if (entity == null) {
+                        // insert it
+                        entity = op.InsertEntity(new Series {
+                            Name = config.Series,
+                            Type = config.SuitType,
+                        });
+                    }
+                    else {
+                        // update it
+                        var se = (Series)entity;
+                        se.Name = config.Series;
+                        se.Type = config.SuitType;
+                        op.ReplaceEntity(se);
+                    }
+                }
+
                 // 1. insert suit
                 Entity? suitEntity = null;
                 if (config.SuitType == SuitVideo) {
                     // this is a suit of videos
                     var op = _appContext.GetDatabase().GetVideoSuitOperator();
                     suitEntity = op.FindEntityByVideoSuitPath(folderPath);
+                    // can't find this suit, insert one
                     if (suitEntity == null) {
                         suitEntity = op.InsertEntity(new VideoSuit {
                             Cover = imageEntity != null ? imageEntity.File : "",
@@ -98,26 +120,29 @@ public class PresetResManager
                             Categories = config.SuitCategories,
                             VideoSuitPath = folderPath,
                             Grades = config.Grades,
-
+                            Series = config.Series,
                         });
                     }
                     else {
-                        var videoSuitEntity = (VideoSuit)suitEntity;
-                        videoSuitEntity.Cover = imageEntity != null ? imageEntity.File : "";
-                        videoSuitEntity.CoverId = imageEntity != null ? imageEntity.Id.ToString() : "";
-                        videoSuitEntity.Name = config.SuitName;
-                        videoSuitEntity.Summary = config.SuitSummary;
-                        videoSuitEntity.Author = config.SuitAuthor;
-                        videoSuitEntity.Categories = config.SuitCategories;
-                        videoSuitEntity.VideoSuitPath = folderPath;
-                        videoSuitEntity.Grades = config.Grades;
-                        op.ReplaceEntity(videoSuitEntity);
+                        // found it, update it.
+                        var vsEntity = (VideoSuit)suitEntity;
+                        vsEntity.Cover = imageEntity != null ? imageEntity.File : "";
+                        vsEntity.CoverId = imageEntity != null ? imageEntity.Id.ToString() : "";
+                        vsEntity.Name = config.SuitName;
+                        vsEntity.Summary = config.SuitSummary;
+                        vsEntity.Author = config.SuitAuthor;
+                        vsEntity.Categories = config.SuitCategories;
+                        vsEntity.VideoSuitPath = folderPath;
+                        vsEntity.Grades = config.Grades;
+                        vsEntity.Series = config.Series;
+                        op.ReplaceEntity(vsEntity);
                     }
                 } 
                 else if (config.SuitType == SuitAudio) {
                     // a suit of audios
                     var op = _appContext.GetDatabase().GetAudioSuitOperator();
                     suitEntity = op.FindEntityByAudioSuitPath(folderPath);
+                    // can't find, insert one
                     if (suitEntity == null) {
                         suitEntity = op.InsertEntity(new AudioSuit {
                             Cover = imageEntity != null ? imageEntity.File : "",
@@ -128,20 +153,22 @@ public class PresetResManager
                             Categories = config.SuitCategories,
                             AudioSuitPath = folderPath,
                             Grades = config.Grades,
-
+                            Series = config.Series,
                         });
                     }
                     else {
-                        var audioSuitEntity = (AudioSuit)suitEntity;
-                        audioSuitEntity.Cover = imageEntity != null ? imageEntity.File : "";
-                        audioSuitEntity.CoverId = imageEntity != null ? imageEntity.Id.ToString() : "";
-                        audioSuitEntity.Name = config.SuitName;
-                        audioSuitEntity.Summary = config.SuitSummary;
-                        audioSuitEntity.Author = config.SuitAuthor;
-                        audioSuitEntity.Categories = config.SuitCategories;
-                        audioSuitEntity.AudioSuitPath = folderPath;
-                        audioSuitEntity.Grades = config.Grades;
-                        op.ReplaceEntity(audioSuitEntity);
+                        // found it, update it.
+                        var asEntity = (AudioSuit)suitEntity;
+                        asEntity.Cover = imageEntity != null ? imageEntity.File : "";
+                        asEntity.CoverId = imageEntity != null ? imageEntity.Id.ToString() : "";
+                        asEntity.Name = config.SuitName;
+                        asEntity.Summary = config.SuitSummary;
+                        asEntity.Author = config.SuitAuthor;
+                        asEntity.Categories = config.SuitCategories;
+                        asEntity.AudioSuitPath = folderPath;
+                        asEntity.Grades = config.Grades;
+                        asEntity.Series = config.Series;
+                        op.ReplaceEntity(asEntity);
                     }
                 } 
                 else if (config.SuitType == SuitBook) {
@@ -158,20 +185,21 @@ public class PresetResManager
                             Categories = config.SuitCategories,
                             BookSuitPath = folderPath,
                             Grades = config.Grades,
-
+                            Series = config.Series,
                         });
                     }
                     else {
-                        var bookSuitEntity = (BookSuit)suitEntity;
-                        bookSuitEntity.Cover = imageEntity != null ? imageEntity.File : "";
-                        bookSuitEntity.CoverId = imageEntity != null ? imageEntity.Id.ToString() : "";
-                        bookSuitEntity.Name = config.SuitName;
-                        bookSuitEntity.Summary = config.SuitSummary;
-                        bookSuitEntity.Author = config.SuitAuthor;
-                        bookSuitEntity.Categories = config.SuitCategories;
-                        bookSuitEntity.BookSuitPath = folderPath;
-                        bookSuitEntity.Grades = config.Grades;
-                        op.ReplaceEntity(bookSuitEntity);
+                        var bsEntity = (BookSuit)suitEntity;
+                        bsEntity.Cover = imageEntity != null ? imageEntity.File : "";
+                        bsEntity.CoverId = imageEntity != null ? imageEntity.Id.ToString() : "";
+                        bsEntity.Name = config.SuitName;
+                        bsEntity.Summary = config.SuitSummary;
+                        bsEntity.Author = config.SuitAuthor;
+                        bsEntity.Categories = config.SuitCategories;
+                        bsEntity.BookSuitPath = folderPath;
+                        bsEntity.Grades = config.Grades;
+                        bsEntity.Series = config.Series;
+                        op.ReplaceEntity(bsEntity);
                     }
                 } 
                 else if (config.SuitType == SuitImage) {
@@ -188,20 +216,21 @@ public class PresetResManager
                             Categories = config.SuitCategories,
                             ImageSuitPath = folderPath,
                             Grades = config.Grades,
-
+                            Series = config.Series,
                         });
                     }
                     else {
-                        var imageSuitEntity = (ImageSuit)suitEntity;
-                        imageSuitEntity.Cover = imageEntity != null ? imageEntity.File : "";
-                        imageSuitEntity.CoverId = imageEntity != null ? imageEntity.Id.ToString() : "";
-                        imageSuitEntity.Name = config.SuitName;
-                        imageSuitEntity.Summary = config.SuitSummary;
-                        imageSuitEntity.Author = config.SuitAuthor;
-                        imageSuitEntity.Categories = config.SuitCategories;
-                        imageSuitEntity.ImageSuitPath = folderPath;
-                        imageSuitEntity.Grades = config.Grades;
-                        op.ReplaceEntity(imageSuitEntity);
+                        var isEntity = (ImageSuit)suitEntity;
+                        isEntity.Cover = imageEntity != null ? imageEntity.File : "";
+                        isEntity.CoverId = imageEntity != null ? imageEntity.Id.ToString() : "";
+                        isEntity.Name = config.SuitName;
+                        isEntity.Summary = config.SuitSummary;
+                        isEntity.Author = config.SuitAuthor;
+                        isEntity.Categories = config.SuitCategories;
+                        isEntity.ImageSuitPath = folderPath;
+                        isEntity.Grades = config.Grades;
+                        isEntity.Series = config.Series;
+                        op.ReplaceEntity(isEntity);
                     }
                 }
 

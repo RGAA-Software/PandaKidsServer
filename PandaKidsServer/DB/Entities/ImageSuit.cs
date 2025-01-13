@@ -9,4 +9,6 @@ public class ImageSuit : Entity
     public List<string> ImageIds = [];
 
     public string ImageSuitPath = "";
+
+    public string Series = "";
 }
