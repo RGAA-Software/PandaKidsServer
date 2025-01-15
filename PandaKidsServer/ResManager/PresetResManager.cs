@@ -1,5 +1,7 @@
 ﻿using Amazon.SecurityToken.Model.Internal.MarshallTransformations;
+using MetadataExtractor;
 using Nett;
+using PandaKidsServer.Common;
 using PandaKidsServer.DB.Entities;
 using static PandaKidsServer.Common.Common;
 using static PandaKidsServer.Common.BasicType;
@@ -31,13 +33,21 @@ public class PresetResManager
 
     public bool ReloadAllResources() {
         var presetPath = _appContext.GetResManager().GetPresetPath();
+        Console.WriteLine("@ "+ presetPath);
         // traverse the whole Preset folder
         TraverseDirectory(presetPath, folderPath => {
             var configPath = "";
             var configCoverPath = "";
             // search for a config file
             Traverse1LevelFiles(folderPath, filePath => {
+                var fileExt = GetFileExtensionLower(filePath);
                 var fileName = GetFileName(filePath);
+                if (fileName != ConfigFile && fileName != ConfigCoverJpg && fileName != ConfigCoverPng
+                    && !IsVideoFile(filePath) && fileExt != ".mp3" && fileExt != ".pdf") {
+                    //Console.WriteLine("Ignore the file: " + filePath);
+                    return false;
+                }
+
                 if (fileName == ConfigFile) {
                     configPath = filePath;    
                 } 
@@ -245,7 +255,7 @@ public class PresetResManager
                     }
 
                     var extension = GetFileExtension(filePath).ToLower();
-                    if (config.SuitType == SuitVideo && extension == ".mp4") {
+                    if (config.SuitType == SuitVideo && IsVideoFile(filePath)) {
                         // video file
                         var videoOp = _appContext.GetDatabase().GetVideoOperator();
                         var resPath = _appContext.GetSettings().ResPath;
@@ -256,7 +266,38 @@ public class PresetResManager
 
                         var refPath = filePath.Substring(resPath.Length + 1);
                         //Console.WriteLine("refPath: " + refPath);
+                        
+                        // generate thumbnail
+                        var targetThumbnailPath = "";
+                        var thumbnailExists = false;
+                        var outputName = GetFileNameWithoutExtension(filePath) + ".png";
+                        var outputFolder = GetFolder(filePath);
+                        if (outputFolder != null) {
+                            outputFolder = outputFolder.Replace("\\", "/");
+                            var outputPath = outputFolder + "/" + outputName;
+                            if (Exists(outputPath)) {
+                                try {
+                                    var md = ImageMetadataReader.ReadMetadata(outputPath);
+                                    thumbnailExists = true;
+                                    targetThumbnailPath = outputPath;
+                                }
+                                catch (Exception e) {
+                                    Console.WriteLine("Get image info failed: " + e.Message);   
+                                }
+                            }
 
+                            if (!thumbnailExists) {
+                                var thumbnailPath = FFmpegHelper.GenerateThumbnail(filePath, outputPath);
+                                if (thumbnailPath != null && thumbnailPath.Contains(resPath)) {
+                                    targetThumbnailPath = thumbnailPath;
+                                    Console.WriteLine("Generate thumbnail: " + thumbnailPath);
+                                }
+                            }
+                        }
+                        if (targetThumbnailPath.Contains(resPath)) {
+                            targetThumbnailPath = targetThumbnailPath[(resPath.Length + 1)..];
+                        }
+                        
                         var videoEntity = videoOp.FindEntityByFilePath(refPath);
                         if (videoEntity == null) {
                             videoOp.InsertEntity(new Video {
@@ -264,6 +305,7 @@ public class PresetResManager
                                 VideoSuitId = suitEntity.Id.ToString(),
                                 File = refPath,
                                 Grades = config.Grades,
+                                Cover = targetThumbnailPath,
                             });
                         }
                         else {
@@ -272,7 +314,10 @@ public class PresetResManager
                             videoEntity.Name = GetFileNameWithoutExtension(filePath);
                             videoEntity.File = refPath;
                             videoEntity.Grades = config.Grades;
-                            videoOp.ReplaceEntity(videoEntity);
+                            videoEntity.Cover = targetThumbnailPath;
+                            if (!videoOp.ReplaceEntity(videoEntity)) {
+                                Console.WriteLine("Replace entity failed!");
+                            }
                         }
                     } 
                     else if (config.SuitType == SuitAudio && extension == ".mp3") {

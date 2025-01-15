@@ -78,10 +78,18 @@ public static class Common
         return Path.GetExtension(absPath);
     }
 
+    public static string GetFileExtensionLower(string absPath) {
+        return Path.GetExtension(absPath).ToLower();
+    }
+
     public static string GetFileNameWithoutExtension(string absPath) {
         return Path.GetFileNameWithoutExtension(absPath);
     }
 
+    public static string? GetFolder(string absPath) {
+        return Path.GetDirectoryName(absPath);
+    }
+    
     public delegate bool OnDirectoryCallback(string path);
     public delegate bool OnFileCallback(string path);
     
@@ -92,8 +100,9 @@ public static class Common
         // }
         //
         var subDirectories = Directory.GetDirectories(currentDirectory);
-        foreach (var subDir in subDirectories)  {
-            if (directoryCallback.Invoke(subDir)) {
+        foreach (var subDir in subDirectories) {
+            var replaceSubDir = subDir.Replace("\\", "/");
+            if (directoryCallback.Invoke(replaceSubDir)) {
                 break;
             }
 
@@ -104,6 +113,7 @@ public static class Common
     public static void Traverse1LevelDirectories(string path, OnDirectoryCallback cbk) {
         var subDirectories = Directory.GetDirectories(path);
         foreach (var subDir in subDirectories)  {
+            var replaceSubDir = subDir.Replace("\\", "/");
             if (cbk.Invoke(subDir)) {
                 break;
             }
@@ -113,7 +123,8 @@ public static class Common
     public static void Traverse1LevelFiles(string path, OnFileCallback cbk) {
         var files = Directory.GetFiles(path);
         foreach (var file in files) {
-            if (cbk.Invoke(file)) {
+            var replaceFile = file.Replace("\\", "/");
+            if (cbk.Invoke(replaceFile)) {
                 break;
             }
         }
@@ -150,5 +161,17 @@ public static class Common
         }
         return [..uniqueNumbers];
     }
-    
+
+    public static bool IsVideoFile(string absPath) {
+        var fileExt = GetFileExtensionLower(absPath);
+        if (fileExt == ".mp4" || fileExt == ".mkv" || fileExt == ".mov") {
+            return true;
+        }
+        return false;
+    }
+
+    public static bool Exists(string filePath) {
+        return Path.Exists(filePath);
+    }
+
 }
