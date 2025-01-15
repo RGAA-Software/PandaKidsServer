@@ -290,18 +290,28 @@ public class PresetResManager
                             }
 
                             if (!thumbnailExists) {
-                                var thumbnailPath = FFmpegHelper.GenerateThumbnail(filePath, outputPath);
+                                var thumbnailPath = FFmpegHelper.GenerateThumbnail(filePath, outputPath, 70);
                                 if (thumbnailPath != null && thumbnailPath.Contains(resPath)) {
+                                    if (!Exists(thumbnailPath)) {
+                                        thumbnailPath = FFmpegHelper.GenerateThumbnail(filePath, outputPath, 30);
+                                    }
+
                                     targetThumbnailPath = thumbnailPath;
+                                    // image scale
+                                    try {
+                                        ImageHelper.ZoomPictureAlongWidth(targetThumbnailPath, 480);
+                                    }
+                                    catch (Exception e) {
+                                        Console.WriteLine("ERROR: " + e.Message + ", file: " + targetThumbnailPath);
+                                    }
+
                                     Console.WriteLine("Generate thumbnail: " + thumbnailPath);
                                 }
                             }
                         }
                         if (targetThumbnailPath.Contains(resPath)) {
-                            // image scale
-                            ImageHelper.ZoomPictureAlongWidth(targetThumbnailPath, 480);
-                            
                             targetThumbnailPath = targetThumbnailPath[(resPath.Length + 1)..];
+                            Console.WriteLine("==> " + targetThumbnailPath);
                         }
                         
                         var videoEntity = videoOp.FindEntityByFilePath(refPath);
@@ -321,6 +331,7 @@ public class PresetResManager
                             videoEntity.File = refPath;
                             videoEntity.Grades = config.Grades;
                             videoEntity.Cover = targetThumbnailPath;
+                            Console.WriteLine("** update " + targetThumbnailPath);
                             if (!videoOp.ReplaceEntity(videoEntity)) {
                                 Console.WriteLine("Replace entity failed!");
                             }
