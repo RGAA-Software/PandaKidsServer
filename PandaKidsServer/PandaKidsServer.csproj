@@ -17,6 +17,9 @@
         <PackageReference Include="MongoDB.Driver.Core" Version="2.29.0"/>
         <PackageReference Include="Nett" Version="0.15.0"/>
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
+        <PackageReference Include="OpenCvSharp4" Version="4.10.0.20241108" />
+        <PackageReference Include="OpenCvSharp4.Extensions" Version="4.10.0.20241108" />
+        <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.10.0.20241108" />
         <PackageReference Include="Serilog" Version="4.1.0-dev-02238"/>
         <PackageReference Include="Serilog.Sinks.File" Version="6.0.0"/>
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2"/>

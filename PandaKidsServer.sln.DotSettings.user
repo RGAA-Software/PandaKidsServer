@@ -3,6 +3,8 @@
   &lt;TestAncestor&gt;&#xD;
     &lt;TestId&gt;NUnit3x::2D3ECE3C-18B8-4D31-B49E-8D67FC257619::net8.0::Tests.TestPresetResource.LoadPresetResources&lt;/TestId&gt;&#xD;
     &lt;TestId&gt;NUnit3x::2D3ECE3C-18B8-4D31-B49E-8D67FC257619::net8.0::Tests.TestThumbnail.GenerateThumbnail&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::2D3ECE3C-18B8-4D31-B49E-8D67FC257619::net8.0::Tests.TestThumbnail.ZoomPicture&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::2D3ECE3C-18B8-4D31-B49E-8D67FC257619::net8.0::Tests.TestThumbnail.ZoomPictureAlongWidth&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
 	<s:String x:Key="/Default/Housekeeping/UnitTestingMru/UnitTestRunner/HangingTestRunnerResponse/@EntryValue">KillProcess</s:String></wpf:ResourceDictionary>

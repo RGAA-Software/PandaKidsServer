@@ -22,4 +22,16 @@ public class TestThumbnail
         Assert.That(thumbnailPath, Is.Not.EqualTo(null));
         Console.WriteLine("output thumbnail: " + thumbnailPath);
     }
+
+    [Test]
+    public void ZoomPicture() {
+        var path = "D:\\PandaKidsResources\\Resources\\Preset\\英文版1-8季（英文字幕）\\06、第六季 25集\\Peppa Pig S06E02 Chinese New Year.png";
+        ImageHelper.ZoomPicture(path, 5);
+    }
+
+    [Test]
+    public void ZoomPictureAlongWidth() {
+        var path = "D:\\PandaKidsResources\\Resources\\Preset\\英文版1-8季（英文字幕）\\06、第六季 25集\\Peppa Pig S06E02 Chinese New Year.png";
+        ImageHelper.ZoomPictureAlongWidth(path, 512);
+    }
 }

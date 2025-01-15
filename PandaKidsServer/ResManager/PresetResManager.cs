@@ -1,10 +1,13 @@
-﻿using Amazon.SecurityToken.Model.Internal.MarshallTransformations;
+﻿using System.Drawing;
+using Amazon.SecurityToken.Model.Internal.MarshallTransformations;
 using MetadataExtractor;
 using Nett;
 using PandaKidsServer.Common;
 using PandaKidsServer.DB.Entities;
 using static PandaKidsServer.Common.Common;
 using static PandaKidsServer.Common.BasicType;
+using System.Drawing.Imaging;
+using Image = PandaKidsServer.DB.Entities.Image;
 
 namespace PandaKidsServer.ResManager;
 
@@ -295,6 +298,9 @@ public class PresetResManager
                             }
                         }
                         if (targetThumbnailPath.Contains(resPath)) {
+                            // image scale
+                            ImageHelper.ZoomPictureAlongWidth(targetThumbnailPath, 480);
+                            
                             targetThumbnailPath = targetThumbnailPath[(resPath.Length + 1)..];
                         }
                         
