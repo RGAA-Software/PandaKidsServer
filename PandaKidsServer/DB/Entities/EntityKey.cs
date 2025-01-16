@@ -9,6 +9,7 @@ public class EntityKey
     public const string KeyContent = "Content";
     public const string KeyDetails = "Details";
     public const string KeyVideoSuitId = "VideoSuitId";
+    public const string KeyBookSuitId = "BookSuitId";
 
     // form
     public const string KeyFile = "File";

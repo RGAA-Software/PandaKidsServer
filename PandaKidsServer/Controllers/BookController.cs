@@ -137,11 +137,19 @@ public class BookController : PkBaseController
     public IActionResult QueryBooks() {
         int page = AsInt(Request.Query[EntityKey.KeyPage]);
         int pageSize = AsInt(Request.Query[EntityKey.KeyPageSize]);
+        var bookSuitId = Request.Query[EntityKey.KeyBookSuitId];
         if (!IsValidInt(page) || !IsValidInt(pageSize)) {
             return RespError(ControllerError.ErrParamErr);
         }
 
-        var books = BookOp.QueryEntities(page, pageSize);
+        List<Book> books;
+        if (IsEmpty(bookSuitId)) {
+            books = BookOp.QueryEntities(page, pageSize);
+        }
+        else {
+            books = BookOp.QueryEntities(bookSuitId, page, pageSize);
+        }
+
         FillInBooks(books);
         
         return RespOkData(EntityKey.RespBooks, books);
