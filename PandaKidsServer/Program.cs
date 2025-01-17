@@ -1,6 +1,7 @@
 using System.Reflection;
 using MediatR;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.FileProviders;
 using PandaKidsServer.Common;
 using PandaKidsServer.Handlers;
@@ -55,10 +56,21 @@ app.UseAuthorization();
 app.MapControllers();
 app.UseWebSockets();
 
-app.UseStaticFiles();
+//app.UseStaticFiles();
+var provider = new FileExtensionContentTypeProvider {
+    Mappings = {
+        [".vtt"] = "text/vtt",
+        [".srt"] = "text/srt"
+    }
+};
+app.UseStaticFiles(new StaticFileOptions {
+    ContentTypeProvider = provider,
+});
+
 app.UseStaticFiles(new StaticFileOptions {
     FileProvider = new PhysicalFileProvider(Path.Combine(appContext.GetSettings().ResPath, "Resources")),
-    RequestPath = "/Resources"
+    RequestPath = "/Resources",
+    ContentTypeProvider = provider
 });
 
 // app.UseDirectoryBrowser(new DirectoryBrowserOptions
