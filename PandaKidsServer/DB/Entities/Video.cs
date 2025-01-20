@@ -9,4 +9,7 @@ public class Video : Entity
 {
     // refer to a video suit
     public string VideoSuitId = "";
+    
+    // subtitle path
+    public string SubtitlePath = "";
 }

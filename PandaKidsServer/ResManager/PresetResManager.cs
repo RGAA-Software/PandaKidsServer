@@ -266,7 +266,8 @@ public class PresetResManager
                             Console.WriteLine("--> Error path : " + filePath);
                             return false;
                         }
-
+                        
+                        // eg: Resources/Preset/xx/xx.mp4
                         var refPath = filePath.Substring(resPath.Length + 1);
                         //Console.WriteLine("refPath: " + refPath);
                         
@@ -314,6 +315,21 @@ public class PresetResManager
                             Console.WriteLine("==> " + targetThumbnailPath);
                         }
                         
+                        // subtitle 
+                        List<string> subtitles = [".srt", ".vtt"];
+                        String subtitleRefPath = "";
+                        foreach (var subtitle in subtitles) {
+                            var path = GetFolder(filePath) + "/" + GetFileNameWithoutExtension(filePath) + subtitle;
+                            path = path.Replace("\\", "/");
+                            if (!Exists(path)) {
+                                continue;
+                            }
+                            Console.WriteLine("subtitle path: " + path);
+                            // todo!!
+                            subtitleRefPath = path.Substring(resPath.Length + 1);
+                            break;
+                        }
+                        
                         var videoEntity = videoOp.FindEntityByFilePath(refPath);
                         if (videoEntity == null) {
                             videoOp.InsertEntity(new Video {
@@ -322,6 +338,7 @@ public class PresetResManager
                                 File = refPath,
                                 Grades = config.Grades,
                                 Cover = targetThumbnailPath,
+                                SubtitlePath = subtitleRefPath,
                             });
                         }
                         else {
@@ -331,7 +348,8 @@ public class PresetResManager
                             videoEntity.File = refPath;
                             videoEntity.Grades = config.Grades;
                             videoEntity.Cover = targetThumbnailPath;
-                            Console.WriteLine("** update " + targetThumbnailPath);
+                            videoEntity.SubtitlePath = subtitleRefPath;
+                            Console.WriteLine("** update " + subtitleRefPath);
                             if (!videoOp.ReplaceEntity(videoEntity)) {
                                 Console.WriteLine("Replace entity failed!");
                             }
